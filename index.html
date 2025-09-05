@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vans RV6 Climb Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Vans RV6 Climb Performance Tool</h1>
+            <p class="text-md text-gray-600 mt-2">Adjust performance data and calculate your climb</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-200 mb-6">
+            <button id="tab1-btn" class="flex-1 py-3 px-4 text-center font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-all duration-200 rounded-t-lg border-b-2 border-transparent hover:border-blue-600 active:border-blue-600">
+                Performance Chart
+            </button>
+            <button id="tab2-btn" class="flex-1 py-3 px-4 text-center font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-all duration-200 rounded-t-lg border-b-2 border-transparent hover:border-blue-600">
+                Climb Calculator
+            </button>
+        </div>
+
+        <!-- Tab 1: Performance Chart -->
+        <div id="tab1-content" class="tab-content active">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-center" id="performance-chart">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tl-lg">Altitude (ft)</th>
+                            <th class="py-3 px-2 font-semibold text-sm">Indicated Airspeed (KIAS)</th>
+                            <th class="py-3 px-2 font-semibold text-sm">Climb Rate (ft/min)</th>
+                            <th class="py-3 px-2 font-semibold text-sm">True Airspeed (KTAS)</th>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tr-lg">Climb Gradient (ft/nm)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white" id="chart-body">
+                        <!-- Data rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-gray-500 mt-4 italic text-center">
+                Edit the Indicated Airspeed and Climb Rate values directly or use the buttons to see the chart update.
+            </p>
+        </div>
+
+        <!-- Tab 2: Climb Calculator -->
+        <div id="tab2-content" class="tab-content">
+            <div class="space-y-6">
+                <div class="flex flex-col">
+                    <label for="start-alt" class="text-sm font-medium text-gray-700 mb-1">Starting Altitude (ft)</label>
+                    <input type="number" id="start-alt" value="0" min="0" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                </div>
+                <div class="flex flex-col">
+                    <label for="end-alt" class="text-sm font-medium text-gray-700 mb-1">Ending Altitude (ft)</label>
+                    <input type="number" id="end-alt" value="5000" min="0" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                </div>
+                <div class="flex flex-col">
+                    <label for="wind" class="text-sm font-medium text-gray-700 mb-1">Average Wind (+Headwind / -Tailwind) (knots)</label>
+                    <input type="number" id="wind" value="0" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                </div>
+                <button id="calculate-btn" class="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+                    Calculate
+                </button>
+            </div>
+            <!-- Result Section -->
+            <div id="result-section" class="mt-8 pt-8 border-t border-gray-200 hidden">
+                <h2 class="text-xl font-bold text-gray-900 mb-4 text-center">Calculated Performance</h2>
+                <div class="space-y-4">
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-600">Time to Climb:</span>
+                        <span id="time-result" class="text-lg font-bold text-blue-800"></span>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-600">Average Climb Gradient:</span>
+                        <span id="gradient-result" class="text-lg font-bold text-blue-800"></span>
+                    </div>
+                </div>
+                <button id="analyze-btn" class="mt-6 w-full py-3 px-4 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    ✨ Analyze Performance
+                </button>
+                <div id="analysis-result" class="mt-6 p-4 bg-gray-100 rounded-lg hidden">
+                    <!-- AI analysis will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Error/Message Box -->
+        <div id="message-box" class="mt-8 hidden p-4 bg-red-100 border border-red-300 rounded-lg text-red-700">
+            <p id="message-text"></p>
+        </div>
+
+        <p class="text-sm text-gray-500 mt-8 italic text-center">
+            Note: These calculations are estimations. Always refer to your aircraft's POH for official performance figures.
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initial data points for the performance chart
+            const initialPerformanceData = [
+                { altitude: 0, kias: 105, rate: 1500 },
+                { altitude: 1000, kias: 105, rate: 1380 },
+                { altitude: 2000, kias: 105, rate: 1260 },
+                { altitude: 3000, kias: 105, rate: 1140 },
+                { altitude: 4000, kias: 105, rate: 1020 },
+                { altitude: 5000, kias: 105, rate: 900 },
+                { altitude: 6000, kias: 105, rate: 780 },
+                { altitude: 7000, kias: 105, rate: 660 },
+                { altitude: 8000, kias: 105, rate: 540 },
+                { altitude: 9000, kias: 95, rate: 490 },
+                { altitude: 10000, kias: 95, rate: 450 },
+                { altitude: 11000, kias: 95, rate: 390 },
+                { altitude: 12000, kias: 95, rate: 330 },
+                { altitude: 13000, kias: 90, rate: 290 },
+                { altitude: 14000, kias: 90, rate: 270 },
+                { altitude: 15000, kias: 90, rate: 250 }
+            ];
+            
+            // This array will hold the current data being displayed and edited on the chart
+            const liveChartData = initialPerformanceData.slice();
+
+            // HTML Elements
+            const tab1Btn = document.getElementById('tab1-btn');
+            const tab2Btn = document.getElementById('tab2-btn');
+            const tab1Content = document.getElementById('tab1-content');
+            const tab2Content = document.getElementById('tab2-content');
+            const chartBody = document.getElementById('chart-body');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const startAltInput = document.getElementById('start-alt');
+            const endAltInput = document.getElementById('end-alt');
+            const windInput = document.getElementById('wind');
+            const resultSection = document.getElementById('result-section');
+            const timeResult = document.getElementById('time-result');
+            const gradientResult = document.getElementById('gradient-result');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const analysisResultDiv = document.getElementById('analysis-result');
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+
+            // --- Tab Switching Logic ---
+            function switchTab(tab) {
+                if (tab === 'chart') {
+                    tab1Btn.classList.add('border-blue-600');
+                    tab2Btn.classList.remove('border-blue-600');
+                    tab1Content.classList.add('active');
+                    tab2Content.classList.remove('active');
+                } else {
+                    tab2Btn.classList.add('border-blue-600');
+                    tab1Btn.classList.remove('border-blue-600');
+                    tab2Content.classList.add('active');
+                    tab1Content.classList.remove('active');
+                }
+            }
+
+            tab1Btn.addEventListener('click', () => switchTab('chart'));
+            tab2Btn.addEventListener('click', () => switchTab('calculator'));
+
+            // Set initial active tab
+            tab1Btn.classList.add('border-blue-600');
+            tab1Content.classList.add('active');
+
+
+            /**
+             * Displays a message in the message box.
+             * @param {string} message - The message to display.
+             * @param {string} type - 'success' or 'error'.
+             */
+            function showMessage(message, type) {
+                messageText.textContent = message;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'border-red-300', 'text-red-700', 'bg-green-100', 'border-green-300', 'text-green-700');
+                if (type === 'error') {
+                    messageBox.classList.add('bg-red-100', 'border-red-300', 'text-red-700');
+                } else {
+                    messageBox.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
+                }
+                messageBox.classList.remove('hidden');
+            }
+
+            /**
+             * Looks up or interpolates climb data for a given altitude from liveChartData.
+             * @param {number} altitude - The altitude in feet.
+             * @param {string} dataType - 'kias' or 'rate'.
+             * @returns {number} The estimated value.
+             */
+            function getValueFromChartData(altitude, dataType) {
+                if (altitude < liveChartData[0].altitude) return liveChartData[0][dataType];
+                if (altitude > liveChartData[liveChartData.length - 1].altitude) {
+                    return liveChartData[liveChartData.length - 1][dataType];
+                }
+
+                for (let i = 0; i < liveChartData.length - 1; i++) {
+                    const p1 = liveChartData[i];
+                    const p2 = liveChartData[i + 1];
+                    if (altitude >= p1.altitude && altitude <= p2.altitude) {
+                        const altitudeFraction = (altitude - p1.altitude) / (p2.altitude - p1.altitude);
+                        const interpolatedValue = p1[dataType] + altitudeFraction * (p2[dataType] - p1[dataType]);
+                        return interpolatedValue;
+                    }
+                }
+                return liveChartData[liveChartData.length - 1][dataType];
+            }
+
+
+            /**
+             * Calculates the True Airspeed (KTAS) from Indicated Airspeed (KIAS) and altitude.
+             * @param {number} ias - The Indicated Airspeed in knots.
+             * @param {number} altitude - The altitude in feet.
+             * @returns {number} The estimated KTAS.
+             */
+            function getTrueAirspeed(ias, altitude) {
+                const tas = ias * (1 + (altitude / 1000) * 0.02);
+                return tas;
+            }
+
+            /**
+             * Generates the performance chart table rows.
+             */
+            function renderChart() {
+                chartBody.innerHTML = ''; // Clear existing rows
+
+                liveChartData.forEach((dataPoint, index) => {
+                    const tas = getTrueAirspeed(dataPoint.kias, dataPoint.altitude);
+                    const speedNmPerMin = tas / 60;
+                    const climbGradient = speedNmPerMin > 0 ? dataPoint.rate / speedNmPerMin : 0;
+
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-200 hover:bg-gray-50';
+
+                    row.innerHTML = `
+                        <td class="py-3 px-2 font-semibold">${dataPoint.altitude.toLocaleString()}</td>
+                        <td class="py-3 px-2">
+                            <div class="flex items-center space-x-2">
+                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
+                                    data-action="decrement" data-type="kias" data-increment="1" data-index="${index}">-</button>
+                                <input type="number" value="${dataPoint.kias}" data-index="${index}" data-type="kias"
+                                    class="w-16 text-center bg-transparent border-none focus:outline-none focus:bg-gray-100 rounded-lg">
+                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
+                                    data-action="increment" data-type="kias" data-increment="1" data-index="${index}">+</button>
+                            </div>
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="flex items-center space-x-2">
+                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
+                                    data-action="decrement" data-type="rate" data-increment="10" data-index="${index}">-</button>
+                                <input type="number" value="${dataPoint.rate}" data-index="${index}" data-type="rate"
+                                    class="w-16 text-center bg-transparent border-none focus:outline-none focus:bg-gray-100 rounded-lg">
+                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
+                                    data-action="increment" data-type="rate" data-increment="10" data-index="${index}">+</button>
+                            </div>
+                        </td>
+                        <td class="py-3 px-2">${Math.round(tas)}</td>
+                        <td class="py-3 px-2">${Math.round(climbGradient)}</td>
+                    `;
+                    chartBody.appendChild(row);
+
+                    // Add event listeners to editable fields and buttons
+                    const rateInput = row.querySelector('input[data-type="rate"]');
+                    if (rateInput) {
+                        rateInput.addEventListener('input', (e) => {
+                            const newRate = parseFloat(e.target.value);
+                            const dataIndex = parseInt(e.target.dataset.index, 10);
+                            if (!isNaN(newRate)) {
+                                liveChartData[dataIndex].rate = newRate;
+                                renderChart(); // Re-render the chart with new data
+                            }
+                        });
+                    }
+                    const iasInput = row.querySelector('input[data-type="kias"]');
+                    if (iasInput) {
+                        iasInput.addEventListener('input', (e) => {
+                            const newIas = parseFloat(e.target.value);
+                            const dataIndex = parseInt(e.target.dataset.index, 10);
+                            if (!isNaN(newIas)) {
+                                liveChartData[dataIndex].kias = newIas;
+                                renderChart(); // Re-render the chart with new data
+                            }
+                        });
+                    }
+                });
+
+                // Attach event listeners to all buttons
+                document.querySelectorAll('button[data-action]').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const action = e.target.dataset.action;
+                        const dataType = e.target.dataset.type;
+                        const increment = parseFloat(e.target.dataset.increment);
+                        const index = parseInt(e.target.dataset.index, 10);
+                        let currentValue = liveChartData[index][dataType];
+                        
+                        if (action === 'increment') {
+                            liveChartData[index][dataType] = currentValue + increment;
+                        } else if (action === 'decrement') {
+                            liveChartData[index][dataType] = currentValue - increment;
+                        }
+                        renderChart();
+                    });
+                });
+            }
+            
+            // --- Calculation Logic for Tab 2 ---
+            calculateBtn.addEventListener('click', function () {
+                const startAlt = parseFloat(startAltInput.value);
+                const endAlt = parseFloat(endAltInput.value);
+                const wind = parseFloat(windInput.value);
+
+                // Input Validation
+                messageBox.classList.add('hidden');
+                analysisResultDiv.classList.add('hidden');
+                analyzeBtn.disabled = true;
+
+                if (isNaN(startAlt) || isNaN(endAlt) || isNaN(wind)) {
+                    showMessage('Please enter valid numbers for all fields.', 'error');
+                    resultSection.classList.add('hidden');
+                    return;
+                }
+                if (startAlt >= endAlt) {
+                    showMessage('Ending altitude must be greater than starting altitude.', 'error');
+                    resultSection.classList.add('hidden');
+                    return;
+                }
+                if (startAlt < 0 || endAlt < 0) {
+                    showMessage('Altitudes cannot be negative.', 'error');
+                    resultSection.classList.add('hidden');
+                    return;
+                }
+
+                let totalTimeMinutes = 0;
+                let totalDistanceNm = 0;
+                const altitudeIncrement = 100;
+
+                for (let alt = startAlt; alt < endAlt; alt += altitudeIncrement) {
+                    const currentAlt = alt;
+                    const nextAlt = Math.min(alt + altitudeIncrement, endAlt);
+                    const segmentAltitudeChange = nextAlt - currentAlt;
+
+                    const rate1 = getValueFromChartData(currentAlt, 'rate');
+                    const rate2 = getValueFromChartData(nextAlt, 'rate');
+                    const avgRate = (rate1 + rate2) / 2;
+
+                    const ias1 = getValueFromChartData(currentAlt, 'kias');
+                    const ias2 = getValueFromChartData(nextAlt, 'kias');
+                    const tas1 = getTrueAirspeed(ias1, currentAlt);
+                    const tas2 = getTrueAirspeed(ias2, nextAlt);
+                    const avgTas = (tas1 + tas2) / 2;
+                    
+                    if (avgRate <= 0) {
+                        showMessage(`Climb is not possible at altitudes above ${currentAlt} ft with this performance data.`, 'error');
+                        return;
+                    }
+
+                    const segmentTimeMinutes = segmentAltitudeChange / avgRate;
+                    const groundSpeed = avgTas - wind;
+                    const segmentDistanceNm = (groundSpeed / 60) * segmentTimeMinutes;
+
+                    totalTimeMinutes += segmentTimeMinutes;
+                    totalDistanceNm += segmentDistanceNm;
+                }
+
+                const averageGradient = totalDistanceNm > 0 ? (endAlt - startAlt) / totalDistanceNm : 0;
+                const totalSeconds = Math.round(totalTimeMinutes * 60);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+
+                // Display Results
+                timeResult.textContent = `${minutes} min ${seconds} sec`;
+                gradientResult.textContent = `${Math.round(averageGradient)} ft/nm`;
+                resultSection.classList.remove('hidden');
+                analyzeBtn.disabled = false;
+            });
+            
+            // --- Gemini API Integration for Analysis ---
+            analyzeBtn.addEventListener('click', async function() {
+                analyzeBtn.disabled = true;
+                analysisResultDiv.innerHTML = '<p class="text-center text-gray-500">Analyzing...</p>';
+                analysisResultDiv.classList.remove('hidden');
+
+                const startAlt = startAltInput.value;
+                const endAlt = endAltInput.value;
+                const wind = windInput.value;
+                const timeStr = timeResult.textContent;
+                const gradientStr = gradientResult.textContent;
+
+                const userQuery = `Analyze the following flight climb performance data and provide a concise summary in a single paragraph. The climb is from ${startAlt} to ${endAlt} feet with an average wind of ${wind} knots. The calculated time to climb is ${timeStr}, and the average climb gradient is ${gradientStr}.`;
+                
+                const apiKey = "" 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: "Act as an experienced flight instructor and provide a brief, professional summary of the climb performance data provided by the user. Do not give any technical values, just interpret the results in plain, easy-to-understand language." }]
+                    },
+                };
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API response was not ok: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    const analysisText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (analysisText) {
+                        analysisResultDiv.innerHTML = `<p>${analysisText}</p>`;
+                    } else {
+                        analysisResultDiv.innerHTML = '<p class="text-center text-red-500">Analysis failed. Please try again.</p>';
+                    }
+
+                } catch (error) {
+                    console.error('Error during Gemini API call:', error);
+                    analysisResultDiv.innerHTML = '<p class="text-center text-red-500">Analysis failed. Please check the console for details.</p>';
+                } finally {
+                    analyzeBtn.disabled = false;
+                }
+            });
+
+            // Initial rendering of the chart
+            renderChart();
+        });
+    </script>
+</body>
+</html>
