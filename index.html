@@ -448,3 +448,56 @@
     </script>
 </body>
 </html>
+<body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8">
+        <!-- ... (previous header content remains the same) ... -->
+
+        <!-- Tab 1: Performance Chart -->
+        <div id="tab1-content" class="tab-content active">
+            <!-- Add Save/Load Controls -->
+            <div class="mb-4 flex justify-end space-x-2">
+                <button id="save-data-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    💾 Save Changes
+                </button>
+                <button id="reset-data-btn" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    ↺ Reset to Default
+                </button>
+            </div>
+            
+            <!-- ... (rest of the performance chart content remains the same) ... -->
+        </div>
+
+        <!-- ... (rest of the content remains the same) ... -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ... (previous code remains the same until initialPerformanceData) ...
+
+            // Load saved data from localStorage if it exists
+            const savedData = localStorage.getItem('performanceChartData');
+            const liveChartData = savedData ? JSON.parse(savedData) : initialPerformanceData.slice();
+
+            // Add event listeners for save and reset buttons
+            const saveDataBtn = document.getElementById('save-data-btn');
+            const resetDataBtn = document.getElementById('reset-data-btn');
+
+            saveDataBtn.addEventListener('click', function() {
+                localStorage.setItem('performanceChartData', JSON.stringify(liveChartData));
+                showMessage('Performance data saved successfully!', 'success');
+            });
+
+            resetDataBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset to default values? This will erase your saved changes.')) {
+                    localStorage.removeItem('performanceChartData');
+                    liveChartData.splice(0, liveChartData.length, ...initialPerformanceData);
+                    renderChart();
+                    showMessage('Performance data reset to default values.', 'success');
+                }
+            });
+
+            // ... (rest of the code remains the same) ...
+        });
+    </script>
+</body>
+</html>
