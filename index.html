@@ -43,14 +43,31 @@
 
         <!-- Tab 1: Performance Chart -->
         <div id="tab1-content" class="tab-content active">
-            <!-- Add Save/Load Controls -->
-            <div class="mb-4 flex justify-end space-x-2">
-                <button id="save-data-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    💾 Save Changes
-                </button>
-                <button id="reset-data-btn" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    ↺ Reset to Default
-                </button>
+            <!-- Weight Input Field -->
+            <div class="mb-4 flex items-center space-x-4">
+                <div class="flex-1">
+                    <label for="takeoff-weight" class="block text-sm font-medium text-gray-700 mb-1">Takeoff Weight (lbs)</label>
+                    <div class="relative flex items-center">
+                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
+                            data-action="decrement-weight" data-increment="10">-</button>
+                        <div class="flex-1 mx-2">
+                            <input type="number" id="takeoff-weight" value="1700" 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-center"
+                                placeholder="1400-1700">
+                            <div class="absolute right-12 top-3 text-sm text-gray-500">(1400-1700 lbs)</div>
+                        </div>
+                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
+                            data-action="increment-weight" data-increment="10">+</button>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="save-data-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        💾 Save Changes
+                    </button>
+                    <button id="reset-data-btn" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        ↺ Reset to Default
+                    </button>
+                </div>
             </div>
             
             <div class="overflow-x-auto">
@@ -127,30 +144,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initial data points for the performance chart
+            // Initial data points for the performance chart (at max weight 1700 lbs)
             const initialPerformanceData = [
-                { altitude: 0, kias: 105, rate: 1500 },
-                { altitude: 1000, kias: 105, rate: 1380 },
-                { altitude: 2000, kias: 105, rate: 1260 },
-                { altitude: 3000, kias: 105, rate: 1140 },
-                { altitude: 4000, kias: 105, rate: 1020 },
-                { altitude: 5000, kias: 105, rate: 900 },
-                { altitude: 6000, kias: 105, rate: 780 },
-                { altitude: 7000, kias: 105, rate: 660 },
-                { altitude: 8000, kias: 105, rate: 540 },
-                { altitude: 9000, kias: 95, rate: 490 },
-                { altitude: 10000, kias: 95, rate: 450 },
-                { altitude: 11000, kias: 95, rate: 390 },
-                { altitude: 12000, kias: 95, rate: 330 },
-                { altitude: 13000, kias: 90, rate: 290 },
-                { altitude: 14000, kias: 90, rate: 270 },
-                { altitude: 15000, kias: 90, rate: 250 }
+                { altitude: 0, kias: 105, rate: 1200, baseRate: 1200 },
+                { altitude: 1000, kias: 105, rate: 1140, baseRate: 1140 },
+                { altitude: 2000, kias: 105, rate: 1080, baseRate: 1080 },
+                { altitude: 3000, kias: 105, rate: 1000, baseRate: 1000 },
+                { altitude: 4000, kias: 105, rate: 920, baseRate: 920 },
+                { altitude: 5000, kias: 105, rate: 830, baseRate: 830 },
+                { altitude: 6000, kias: 105, rate: 730, baseRate: 730 },
+                { altitude: 7000, kias: 105, rate: 610, baseRate: 610 },
+                { altitude: 8000, kias: 105, rate: 500, baseRate: 500 },
+                { altitude: 9000, kias: 95, rate: 490, baseRate: 490 },
+                { altitude: 10000, kias: 95, rate: 430, baseRate: 430 },
+                { altitude: 11000, kias: 95, rate: 370, baseRate: 370 },
+                { altitude: 12000, kias: 95, rate: 310, baseRate: 310 },
+                { altitude: 13000, kias: 95, rate: 250, baseRate: 250 },
+                { altitude: 14000, kias: 90, rate: 220, baseRate: 220 },
+                { altitude: 15000, kias: 90, rate: 170, baseRate: 170 },
+                { altitude: 16000, kias: 90, rate: 120, baseRate: 120 },
+                { altitude: 17000, kias: 90, rate: 60, baseRate: 60 },
+                { altitude: 18000, kias: 90, rate: 20, baseRate: 20 }
             ];
             
             // This array will hold the current data being displayed and edited on the chart
             // Load saved data from localStorage if it exists
             const savedData = localStorage.getItem('performanceChartData');
             const liveChartData = savedData ? JSON.parse(savedData) : initialPerformanceData.slice();
+
+            // Function to update performance based on weight
+            function updatePerformanceForWeight(weight) {
+                const maxWeight = 1700;
+                const performanceImprovement = ((maxWeight - weight) / maxWeight) * 100;
+                
+                liveChartData.forEach((dataPoint, index) => {
+                    const baseRate = initialPerformanceData[index].baseRate;
+                    dataPoint.rate = Math.round(baseRate * (1 + performanceImprovement / 100));
+                });
+                renderChart();
+            }
 
             // HTML Elements
             const tab1Btn = document.getElementById('tab1-btn');
@@ -469,7 +501,36 @@
                 showMessage('Performance data reset to default values.', 'success');
             });
 
-            // Initial rendering of the chart
+            // Add event listeners for takeoff weight changes
+            const takeoffWeightInput = document.getElementById('takeoff-weight');
+            
+            function validateAndUpdateWeight(weight) {
+                const validatedWeight = Math.min(Math.max(weight, 1400), 1700);
+                takeoffWeightInput.value = validatedWeight;
+                updatePerformanceForWeight(validatedWeight);
+            }
+
+            takeoffWeightInput.addEventListener('input', function() {
+                const weight = parseFloat(this.value);
+                if (!isNaN(weight)) {
+                    validateAndUpdateWeight(weight);
+                }
+            });
+
+            // Add event listeners for weight adjustment buttons
+            document.querySelector('button[data-action="increment-weight"]').addEventListener('click', function() {
+                const currentWeight = parseFloat(takeoffWeightInput.value) || 1700;
+                const increment = parseFloat(this.dataset.increment);
+                validateAndUpdateWeight(currentWeight + increment);
+            });
+
+            document.querySelector('button[data-action="decrement-weight"]').addEventListener('click', function() {
+                const currentWeight = parseFloat(takeoffWeightInput.value) || 1700;
+                const increment = parseFloat(this.dataset.increment);
+                validateAndUpdateWeight(currentWeight - increment);
+            });
+
+            // Initial rendering of the chart with default weight (1700 lbs)
             renderChart();
         });
     </script>
