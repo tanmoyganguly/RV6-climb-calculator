@@ -37,40 +37,40 @@
                 Performance Chart
             </button>
             <button id="tab2-btn" class="flex-1 py-3 px-4 text-center font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-all duration-200 rounded-t-lg border-b-2 border-transparent hover:border-blue-600">
-                Climb Calculator
+                Performance Calculator
             </button>
         </div>
 
         <!-- Tab 1: Performance Chart -->
         <div id="tab1-content" class="tab-content active">
-            <!-- Weight Input Field -->
-            <div class="mb-4 flex items-center space-x-4">
-                <div class="flex-1">
-                    <label for="takeoff-weight" class="block text-sm font-medium text-gray-700 mb-1">Takeoff Weight (lbs)</label>
-                    <div class="relative flex items-center">
-                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
-                            data-action="decrement-weight" data-increment="10">-</button>
-                        <div class="flex-1 mx-2">
-                            <input type="number" id="takeoff-weight" value="1700" 
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-center"
-                                placeholder="1400-1700">
-                            <div class="absolute right-12 top-3 text-sm text-gray-500">(1400-1700 lbs)</div>
-                        </div>
-                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
-                            data-action="increment-weight" data-increment="10">+</button>
+            <!-- Static Weight Display and Prop Pitch Slider -->
+            <div class="mb-4 space-y-4">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <span class="text-sm font-medium text-gray-700">Standard Weight: 1700 lbs</span>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <label for="prop-pitch-bias" class="block text-sm font-medium text-gray-700 mb-2">PROP Pitch Setting</label>
+                    <div class="flex items-center space-x-4 mb-3">
+                        <span class="text-sm text-gray-600 whitespace-nowrap">Takeoff/Climb</span>
+                        <input type="range" id="prop-pitch-bias" 
+                            min="80" max="120" value="100" step="1"
+                            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        >
+                        <span class="text-sm text-gray-600 whitespace-nowrap">Cruise</span>
+                        <span id="prop-pitch-value" class="text-sm font-semibold bg-blue-100 px-2 py-1 rounded">100%</span>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button id="save-data-btn" class="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            💾 Save Changes
+                        </button>
+                        <button id="reset-data-btn" class="px-4 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            ↺ Reset to Default
+                        </button>
                     </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button id="save-data-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        💾 Save Changes
-                    </button>
-                    <button id="reset-data-btn" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                        ↺ Reset to Default
-                    </button>
-                </div>
             </div>
-            
-            <div class="overflow-x-auto">
+
+            <div class="overflow-x-auto mb-8">
                 <table class="min-w-full text-center" id="performance-chart">
                     <thead class="bg-gray-800 text-white">
                         <tr>
@@ -86,48 +86,186 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Takeoff Distance Chart -->
+            <div class="overflow-x-auto mb-8">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Takeoff Distance Chart</h2>
+                <table class="min-w-full text-center" id="takeoff-distance-chart">
+                    <thead class="bg-blue-800 text-white">
+                        <tr>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tl-lg">Altitude (ft)</th>
+                            <th class="py-3 px-2 font-semibold text-sm">Ground Roll (ft)</th>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tr-lg">Distance over 50ft (ft)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white" id="takeoff-distance-body">
+                        <!-- Data rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Landing Distance Chart -->
+            <div class="overflow-x-auto mb-8">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Landing Distance Chart</h2>
+                <table class="min-w-full text-center" id="landing-distance-chart">
+                    <thead class="bg-green-800 text-white">
+                        <tr>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tl-lg">Altitude (ft)</th>
+                            <th class="py-3 px-2 font-semibold text-sm">Ground Roll (ft)</th>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tr-lg">Distance over 50ft (ft)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white" id="landing-distance-body">
+                        <!-- Data rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
             <p class="text-sm text-gray-500 mt-4 italic text-center">
                 Edit the Indicated Airspeed and Climb Rate values directly or use the buttons to see the chart update.
             </p>
         </div>
 
-        <!-- Tab 2: Climb Calculator -->
+        <!-- Tab 2: Performance Calculator -->
         <div id="tab2-content" class="tab-content">
-            <div class="space-y-6">
-                <div class="flex flex-col">
-                    <label for="start-alt" class="text-sm font-medium text-gray-700 mb-1">Starting Altitude (ft)</label>
-                    <input type="number" id="start-alt" value="0" min="0" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+            <!-- TAKEOFF Section -->
+            <div class="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <h2 class="text-lg font-bold text-blue-800 mb-4">Takeoff</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="takeoff-weight-input" class="block text-sm font-medium text-gray-700 mb-1">Takeoff Weight (lbs)</label>
+                        <input type="number" id="takeoff-weight-input" value="1700" min="1400" max="1700" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Weight affects performance by approximately -15% per 10% below max weight (1700 lbs). A lighter aircraft will have better performance.">
+                    </div>
+                    <div>
+                        <label for="takeoff-oat" class="block text-sm font-medium text-gray-700 mb-1">Takeoff OAT (°C)</label>
+                        <input type="number" id="takeoff-oat" value="15" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Outside Air Temperature affects density altitude. Performance changes by approximately 2% per 10°C from standard (15°C). Higher temperatures reduce performance.">
+                    </div>
+                    <div>
+                        <label for="takeoff-surface" class="block text-sm font-medium text-gray-700 mb-1">Runway Surface Type</label>
+                        <select id="takeoff-surface" class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Surface factors: Paved = 1.0 (base), Grass = 1.15 (+15% distance), Gravel = 1.10 (+10% distance)">
+                            <option value="paved">Paved</option>
+                            <option value="grass">Grass</option>
+                            <option value="gravel">Gravel</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="takeoff-elevation" class="block text-sm font-medium text-gray-700 mb-1">Takeoff Elevation (ft)</label>
+                        <input type="number" id="takeoff-elevation" value="0" min="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Field elevation affects density altitude and true airspeed. Higher elevations reduce performance based on the standard lapse rate.">
+                    </div>
+                    <div>
+                        <label for="takeoff-wind" class="block text-sm font-medium text-gray-700 mb-1">Winds at Takeoff (knots, +/-)</label>
+                        <input type="number" id="takeoff-wind" value="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Wind effect: Headwind (+) decreases distance by 10% per 10 knots. Tailwind (-) increases distance by 10% per 2 knots.">
+                    </div>
                 </div>
-                <div class="flex flex-col">
-                    <label for="end-alt" class="text-sm font-medium text-gray-700 mb-1">Ending Altitude (ft)</label>
-                    <input type="number" id="end-alt" value="5000" min="0" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Ground Roll = Base distance × Surface factor × Wind factor × OAT factor × Weight factor. Base distance is interpolated from the performance chart based on elevation.">
+                        <span class="block text-sm font-medium text-gray-600">Ground Roll:</span>
+                        <span id="takeoff-performance-result" class="text-lg font-bold text-blue-800"></span>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Total Distance = Ground Roll × 1.6. The distance to clear a 50ft obstacle is typically 60% more than the ground roll distance.">
+                        <span class="block text-sm font-medium text-gray-600">Distance over 50ft:</span>
+                        <span id="takeoff-over50ft-result" class="text-lg font-bold text-blue-800"></span>
+                    </div>
                 </div>
-                <div class="flex flex-col">
-                    <label for="wind" class="text-sm font-medium text-gray-700 mb-1">Average Wind (+Headwind / -Tailwind) (knots)</label>
-                    <input type="number" id="wind" value="0" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                </div>
-                <button id="calculate-btn" class="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
-                    Calculate
-                </button>
             </div>
-            <!-- Result Section -->
-            <div id="result-section" class="mt-8 pt-8 border-t border-gray-200 hidden">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 text-center">Calculated Performance</h2>
-                <div class="space-y-4">
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-600">Time to Climb:</span>
-                        <span id="time-result" class="text-lg font-bold text-blue-800"></span>
+
+            <!-- CRUISE Section -->
+            <div class="mb-8 p-6 bg-green-50 rounded-lg border border-green-200">
+                <h2 class="text-lg font-bold text-green-800 mb-4">Cruise</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="cruise-altitude" class="block text-sm font-medium text-gray-700 mb-1">Cruise Altitude (ft)</label>
+                        <input type="number" id="cruise-altitude" value="5000" min="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Target altitude for the climb. Climb performance decreases with altitude according to the performance chart. Maximum practical ceiling around 18,000 ft.">
                     </div>
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-600">Average Climb Gradient:</span>
-                        <span id="gradient-result" class="text-lg font-bold text-blue-800"></span>
+                    <div>
+                        <label for="winds-aloft" class="block text-sm font-medium text-gray-700 mb-1">Winds Aloft (knots, +/-)</label>
+                        <input type="number" id="winds-aloft" value="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Winds at cruise altitude. Wind is interpolated between takeoff and cruise altitude. Positive = headwind, Negative = tailwind. Affects ground speed and distance calculations.">
                     </div>
                 </div>
-                <button id="analyze-btn" class="mt-6 w-full py-3 px-4 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                    ✨ Analyze Performance
-                </button>
-                <div id="analysis-result" class="mt-6 p-4 bg-gray-100 rounded-lg hidden">
-                    <!-- AI analysis will be displayed here -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Time = Σ(Segment Height ÷ Average Rate of Climb). Calculated in 100ft segments using interpolated climb rates from the performance chart.">
+                        <span class="block text-sm font-medium text-gray-600">Time to Cruise Altitude:</span>
+                        <span id="time-to-cruise-result" class="text-lg font-bold text-green-800"></span>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Distance = Σ(Ground Speed × Time). Ground Speed = True Airspeed - Interpolated Wind. True airspeed increases with altitude by ~2% per 1000ft.">
+                        <span class="block text-sm font-medium text-gray-600">Distance to Cruise Altitude:</span>
+                        <span id="distance-to-cruise-result" class="text-lg font-bold text-green-800"></span>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Average Gradient = Total Altitude Gain ÷ Total Distance. Higher gradients indicate steeper climbs. Affected by winds - headwinds increase gradient, tailwinds decrease it.">
+                        <span class="block text-sm font-medium text-gray-600">Average Climb Gradient (ft/nm):</span>
+                        <span id="avg-climb-gradient-result" class="text-lg font-bold text-green-800"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LANDING Section -->
+            <div class="mb-8 p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+                <h2 class="text-lg font-bold text-yellow-800 mb-4">Landing</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="landing-weight" class="block text-sm font-medium text-gray-700 mb-1">Landing Weight (lbs)</label>
+                        <input type="number" id="landing-weight" value="1700" min="1400" max="1700" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Weight affects landing distance by approximately -15% per 10% below max weight (1700 lbs). A lighter aircraft will require less landing distance.">
+                    </div>
+                    <div>
+                        <label for="landing-oat" class="block text-sm font-medium text-gray-700 mb-1">Landing OAT (°C)</label>
+                        <input type="number" id="landing-oat" value="15" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Outside Air Temperature affects density altitude. Landing distance changes by approximately 2% per 10°C from standard (15°C). Higher temperatures increase landing distance.">
+                    </div>
+                    <div>
+                        <label for="landing-surface" class="block text-sm font-medium text-gray-700 mb-1">Runway Surface Type</label>
+                        <select id="landing-surface" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Surface factors: Paved = 1.0 (base), Grass = 1.15 (+15% distance), Gravel = 1.10 (+10% distance). Same factors as takeoff.">
+                            <option value="paved">Paved</option>
+                            <option value="grass">Grass</option>
+                            <option value="gravel">Gravel</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="landing-elevation" class="block text-sm font-medium text-gray-700 mb-1">Landing Elevation (ft)</label>
+                        <input type="number" id="landing-elevation" value="0" min="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Field elevation affects density altitude and true airspeed. Higher elevations increase landing distance based on the standard lapse rate.">
+                    </div>
+                    <div>
+                        <label for="landing-wind" class="block text-sm font-medium text-gray-700 mb-1">Winds at Landing (knots, +/-)</label>
+                        <input type="number" id="landing-wind" value="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Wind effect: Headwind (+) decreases distance by 10% per 10 knots. Tailwind (-) increases distance by 10% per 2 knots. Same factors as takeoff.">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Ground Roll = Base distance × Surface factor × Wind factor × OAT factor × Weight factor. Base distance is interpolated from the performance chart based on elevation.">
+                        <span class="block text-sm font-medium text-gray-600">Ground Roll:</span>
+                        <span id="landing-performance-result" class="text-lg font-bold text-yellow-800"></span>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg border border-gray-200"
+                        title="Total Distance = Ground Roll × 1.4. The distance from 50ft to touchdown plus ground roll is typically 40% more than the ground roll distance alone.">
+                        <span class="block text-sm font-medium text-gray-600">Distance over 50ft:</span>
+                        <span id="landing-over50ft-result" class="text-lg font-bold text-yellow-800"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,66 +281,289 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initial data points for the performance chart (at max weight 1700 lbs)
-            const initialPerformanceData = [
-                { altitude: 0, kias: 105, rate: 1200, baseRate: 1200 },
-                { altitude: 1000, kias: 105, rate: 1140, baseRate: 1140 },
-                { altitude: 2000, kias: 105, rate: 1080, baseRate: 1080 },
-                { altitude: 3000, kias: 105, rate: 1000, baseRate: 1000 },
-                { altitude: 4000, kias: 105, rate: 920, baseRate: 920 },
-                { altitude: 5000, kias: 105, rate: 830, baseRate: 830 },
-                { altitude: 6000, kias: 105, rate: 730, baseRate: 730 },
-                { altitude: 7000, kias: 105, rate: 610, baseRate: 610 },
-                { altitude: 8000, kias: 105, rate: 500, baseRate: 500 },
-                { altitude: 9000, kias: 95, rate: 490, baseRate: 490 },
-                { altitude: 10000, kias: 95, rate: 430, baseRate: 430 },
-                { altitude: 11000, kias: 95, rate: 370, baseRate: 370 },
-                { altitude: 12000, kias: 95, rate: 310, baseRate: 310 },
-                { altitude: 13000, kias: 95, rate: 250, baseRate: 250 },
-                { altitude: 14000, kias: 90, rate: 220, baseRate: 220 },
-                { altitude: 15000, kias: 90, rate: 170, baseRate: 170 },
-                { altitude: 16000, kias: 90, rate: 120, baseRate: 120 },
-                { altitude: 17000, kias: 90, rate: 60, baseRate: 60 },
-                { altitude: 18000, kias: 90, rate: 20, baseRate: 20 }
-            ];
-            
-            // This array will hold the current data being displayed and edited on the chart
-            // Load saved data from localStorage if it exists
-            const savedData = localStorage.getItem('performanceChartData');
-            const liveChartData = savedData ? JSON.parse(savedData) : initialPerformanceData.slice();
+    window.liveChartData = [];
+    window.liveTakeoffData = [];
+    window.liveLandingData = [];
+    window.propPitchBias = 1.0;
+    // Embedded performance data (from CSVs)
+    const initialPerformanceData = [
+        { altitude: 0, kias: 105, rate: 1200 },
+        { altitude: 1000, kias: 105, rate: 1140 },
+        { altitude: 2000, kias: 105, rate: 1080 },
+        { altitude: 3000, kias: 110, rate: 1000 },
+        { altitude: 4000, kias: 110, rate: 920 },
+        { altitude: 5000, kias: 110, rate: 830 },
+        { altitude: 6000, kias: 110, rate: 730 },
+        { altitude: 7000, kias: 110, rate: 610 },
+        { altitude: 8000, kias: 110, rate: 500 },
+        { altitude: 9000, kias: 105, rate: 470 },
+        { altitude: 10000, kias: 105, rate: 430 },
+        { altitude: 11000, kias: 105, rate: 370 },
+        { altitude: 12000, kias: 100, rate: 310 },
+        { altitude: 13000, kias: 100, rate: 250 },
+        { altitude: 14000, kias: 100, rate: 220 },
+        { altitude: 15000, kias: 100, rate: 170 },
+        { altitude: 16000, kias: 95, rate: 120 },
+        { altitude: 17000, kias: 95, rate: 60 },
+        { altitude: 18000, kias: 95, rate: 20 }
+    ];
+    function calcDistanceOver50ft(groundRoll, type) {
+        return type === 'takeoff' ? Math.round(groundRoll * 1.6) : Math.round(groundRoll * 1.4);
+    }
+    const takeoffPerformance = [
+        { altitude: 0, groundRoll: 575 },
+        { altitude: 1000, groundRoll: 605 },
+        { altitude: 2000, groundRoll: 640 },
+        { altitude: 3000, groundRoll: 680 },
+        { altitude: 4000, groundRoll: 725 },
+        { altitude: 5000, groundRoll: 780 },
+        { altitude: 6000, groundRoll: 850 },
+        { altitude: 7000, groundRoll: 940 },
+        { altitude: 8000, groundRoll: 1050 },
+        { altitude: 9000, groundRoll: 1180 },
+        { altitude: 10000, groundRoll: 1335 },
+        { altitude: 11000, groundRoll: 1520 },
+        { altitude: 12000, groundRoll: 1740 },
+        { altitude: 13000, groundRoll: 2000 },
+        { altitude: 14000, groundRoll: 2310 }
+    ].map(row => ({ ...row, over50ft: calcDistanceOver50ft(row.groundRoll, 'takeoff') }));
+    const landingPerformance = [
+        { altitude: 0, groundRoll: 525 },
+        { altitude: 1000, groundRoll: 550 },
+        { altitude: 2000, groundRoll: 580 },
+        { altitude: 3000, groundRoll: 615 },
+        { altitude: 4000, groundRoll: 660 },
+        { altitude: 5000, groundRoll: 715 },
+        { altitude: 6000, groundRoll: 785 },
+        { altitude: 7000, groundRoll: 875 },
+        { altitude: 8000, groundRoll: 990 },
+        { altitude: 9000, groundRoll: 1135 },
+        { altitude: 10000, groundRoll: 1315 },
+        { altitude: 11000, groundRoll: 1540 },
+        { altitude: 12000, groundRoll: 1775 },
+        { altitude: 13000, groundRoll: 2000 },
+        { altitude: 14000, groundRoll: 2300 }
+    ].map(row => ({ ...row, over50ft: calcDistanceOver50ft(row.groundRoll, 'landing') }));
+    document.addEventListener('DOMContentLoaded', function () {
+            // Declare chart containers and all other elements after DOM is loaded
+            window.chartBody = document.getElementById('chart-body');
+            window.takeoffDistanceBody = document.getElementById('takeoff-distance-body');
+            window.landingDistanceBody = document.getElementById('landing-distance-body');
 
-            // Function to update performance based on weight
-            function updatePerformanceForWeight(weight) {
-                const maxWeight = 1700;
-                const performanceImprovement = ((maxWeight - weight) / maxWeight) * 100;
-                
-                liveChartData.forEach((dataPoint, index) => {
-                    const baseRate = initialPerformanceData[index].baseRate;
-                    dataPoint.rate = Math.round(baseRate * (1 + performanceImprovement / 100));
-                });
-                renderChart();
-            }
-
-            // HTML Elements
+            // Tab and button elements
             const tab1Btn = document.getElementById('tab1-btn');
             const tab2Btn = document.getElementById('tab2-btn');
             const tab1Content = document.getElementById('tab1-content');
             const tab2Content = document.getElementById('tab2-content');
-            const chartBody = document.getElementById('chart-body');
-            const calculateBtn = document.getElementById('calculate-btn');
-            const startAltInput = document.getElementById('start-alt');
-            const endAltInput = document.getElementById('end-alt');
-            const windInput = document.getElementById('wind');
-            const resultSection = document.getElementById('result-section');
-            const timeResult = document.getElementById('time-result');
-            const gradientResult = document.getElementById('gradient-result');
-            const analyzeBtn = document.getElementById('analyze-btn');
-            const analysisResultDiv = document.getElementById('analysis-result');
-            const messageBox = document.getElementById('message-box');
-            const messageText = document.getElementById('message-text');
             const saveDataBtn = document.getElementById('save-data-btn');
             const resetDataBtn = document.getElementById('reset-data-btn');
+            // Performance Calculator tab elements (new layout)
+            // TAKEOFF
+            const takeoffWeightInput2 = document.getElementById('takeoff-weight-input');
+            const takeoffOATInput = document.getElementById('takeoff-oat');
+            const takeoffSurfaceInput = document.getElementById('takeoff-surface');
+            const takeoffElevationInput = document.getElementById('takeoff-elevation');
+            const takeoffWindInput = document.getElementById('takeoff-wind');
+            const takeoffPerfResult = document.getElementById('takeoff-performance-result');
+            const takeoffOver50ftResult = document.getElementById('takeoff-over50ft-result');
+            // CRUISE
+            const cruiseAltitudeInput = document.getElementById('cruise-altitude');
+            const windsAloftInput = document.getElementById('winds-aloft');
+            const timeToCruiseResult = document.getElementById('time-to-cruise-result');
+            const distanceToCruiseResult = document.getElementById('distance-to-cruise-result');
+            const avgClimbGradientResult = document.getElementById('avg-climb-gradient-result');
+            // LANDING
+            const landingWeightInput = document.getElementById('landing-weight');
+            const landingOATInput = document.getElementById('landing-oat');
+            const landingSurfaceInput = document.getElementById('landing-surface');
+            const landingElevationInput = document.getElementById('landing-elevation');
+            const landingWindInput = document.getElementById('landing-wind');
+            const landingPerfResult = document.getElementById('landing-performance-result');
+            const landingOver50ftResult = document.getElementById('landing-over50ft-result');
+            // Error/message
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            // --- Standard aviation adjustment formulas ---
+            function surfaceFactor(type) {
+                if (type === 'grass') return 1.15;
+                if (type === 'gravel') return 1.10;
+                return 1.0;
+            }
+            function windFactor(wind) {
+                // Positive wind is headwind, negative is tailwind
+                if (wind >= 0) {
+                    // Headwind: 10% decrease per 10 knots
+                    return 1 - (wind / 100);
+                } else {
+                    // Tailwind: 10% increase per 2 knots (wind is negative)
+                    return 1 - ((wind / 2) / 10); // negative wind makes this an increase
+                }
+            }
+            function oatFactor(oat) {
+                // Hotter increases, colder decreases, approx 2% per 10°C above/below 15°C
+                return 1 + ((oat - 15) / 50);
+            }
+            function weightFactor(weight) {
+                // Lighter = better, approx 15% reduction per 10% below 1700lbs
+                return 1 - ((1700 - weight) / 1700);
+            }
+
+            // --- TAKEOFF calculation ---
+            function updateTakeoffPerformance() {
+                const weight = parseFloat(takeoffWeightInput2.value);
+                const oat = parseFloat(takeoffOATInput.value);
+                const surface = takeoffSurfaceInput.value;
+                const elevation = parseFloat(takeoffElevationInput.value);
+                const wind = parseFloat(takeoffWindInput.value);
+                // Lookup base performance
+                let perf = lookupPerformance((window.liveTakeoffData && window.liveTakeoffData.length > 0) ? window.liveTakeoffData : takeoffPerformance, elevation, 'takeoff');
+                let groundRoll = Math.round(perf.groundRoll * surfaceFactor(surface) * windFactor(wind) * oatFactor(oat) * weightFactor(weight));
+                let over50ft = Math.round(perf.over50ft * surfaceFactor(surface) * windFactor(wind) * oatFactor(oat) * weightFactor(weight));
+                takeoffPerfResult.textContent = `${groundRoll} ft`;
+                takeoffOver50ftResult.textContent = `${over50ft} ft`;
+            }
+
+            // --- CRUISE calculation ---
+            function updateCruisePerformance() {
+                const startAlt = parseFloat(takeoffElevationInput.value);
+                const cruiseAlt = parseFloat(cruiseAltitudeInput.value);
+                const takeoffWind = parseFloat(takeoffWindInput.value);
+                const cruiseWind = parseFloat(windsAloftInput.value);
+                let totalTimeMinutes = 0;
+                let totalDistanceNm = 0;
+                const altitudeIncrement = 100;
+
+                function interpolateWind(altitude) {
+                    // Linear interpolation of wind between takeoff and cruise altitude
+                    const windDiff = cruiseWind - takeoffWind;
+                    const altitudeDiff = cruiseAlt - startAlt;
+                    const altitudeFraction = (altitude - startAlt) / altitudeDiff;
+                    return takeoffWind + (windDiff * altitudeFraction);
+                }
+
+                for (let alt = startAlt; alt < cruiseAlt; alt += altitudeIncrement) {
+                    const currentAlt = alt;
+                    const nextAlt = Math.min(alt + altitudeIncrement, cruiseAlt);
+                    const segmentAltitudeChange = nextAlt - currentAlt;
+                    
+                    // Get performance values for current and next altitude
+                    const rate1 = getValueFromChartData(currentAlt, 'rate');
+                    const rate2 = getValueFromChartData(nextAlt, 'rate');
+                    const avgRate = (rate1 + rate2) / 2;
+                    
+                    // Calculate true airspeed
+                    const ias1 = getValueFromChartData(currentAlt, 'kias');
+                    const ias2 = getValueFromChartData(nextAlt, 'kias');
+                    const tas1 = getTrueAirspeed(ias1, currentAlt);
+                    const tas2 = getTrueAirspeed(ias2, nextAlt);
+                    const avgTas = (tas1 + tas2) / 2;
+                    
+                    if (avgRate <= 0) break;
+                    
+                    // Get interpolated wind for the current segment
+                    const avgAlt = (currentAlt + nextAlt) / 2;
+                    const segmentWind = interpolateWind(avgAlt);
+                    
+                    const segmentTimeMinutes = segmentAltitudeChange / avgRate;
+                    const groundSpeed = avgTas - segmentWind; // Use interpolated wind
+                    const segmentDistanceNm = (groundSpeed / 60) * segmentTimeMinutes;
+                    
+                    totalTimeMinutes += segmentTimeMinutes;
+                    totalDistanceNm += segmentDistanceNm;
+                }
+                const averageGradient = totalDistanceNm > 0 ? (cruiseAlt - startAlt) / totalDistanceNm : 0;
+                const totalSeconds = Math.round(totalTimeMinutes * 60);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                timeToCruiseResult.textContent = `${minutes} min ${seconds} sec`;
+                distanceToCruiseResult.textContent = `${totalDistanceNm.toFixed(1)} nm`;
+                avgClimbGradientResult.textContent = `${Math.round(averageGradient)} ft/nm`;
+            }
+
+            // --- LANDING calculation ---
+            function updateLandingPerformance() {
+                const weight = parseFloat(landingWeightInput.value);
+                const oat = parseFloat(landingOATInput.value);
+                const surface = landingSurfaceInput.value;
+                const elevation = parseFloat(landingElevationInput.value);
+                const wind = parseFloat(landingWindInput.value);
+                let perf = lookupPerformance((window.liveLandingData && window.liveLandingData.length > 0) ? window.liveLandingData : landingPerformance, elevation);
+                let groundRoll = Math.round(perf.groundRoll * surfaceFactor(surface) * windFactor(wind) * oatFactor(oat) * weightFactor(weight));
+                let over50ft = Math.round(perf.over50ft * surfaceFactor(surface) * windFactor(wind) * oatFactor(oat) * weightFactor(weight));
+                landingPerfResult.textContent = `${groundRoll} ft`;
+                landingOver50ftResult.textContent = `${over50ft} ft`;
+            }
+
+            // --- Utility: lookup/interpolate performance ---
+            function lookupPerformance(perfArr, alt, type = 'takeoff') {
+                // Apply inverse prop pitch bias to takeoff/landing distances
+                // When prop is in cruise (high value), distances increase
+                // When prop is in climb (low value), distances decrease
+                const fullBias = 2 - window.propPitchBias; // inverse of climb bias
+                // For landing, only apply half the bias effect
+                const distanceBias = type === 'landing' ? 1 + (fullBias - 1) * 0.5 : fullBias;
+                
+                for (let i = 0; i < perfArr.length-1; i++) {
+                    if (alt >= perfArr[i].altitude && alt <= perfArr[i+1].altitude) {
+                        const frac = (alt - perfArr[i].altitude) / (perfArr[i+1].altitude - perfArr[i].altitude);
+                        const baseGroundRoll = perfArr[i].groundRoll + frac * (perfArr[i+1].groundRoll - perfArr[i].groundRoll);
+                        const baseOver50ft = perfArr[i].over50ft + frac * (perfArr[i+1].over50ft - perfArr[i].over50ft);
+                        return {
+                            groundRoll: Math.round(baseGroundRoll * distanceBias),
+                            over50ft: Math.round(baseOver50ft * distanceBias)
+                        };
+                    }
+                }
+                const lastPerf = perfArr[perfArr.length-1];
+                return {
+                    groundRoll: Math.round(lastPerf.groundRoll * distanceBias),
+                    over50ft: Math.round(lastPerf.over50ft * distanceBias)
+                };
+            }
+
+            // --- Event listeners for all inputs ---
+            [takeoffWeightInput2, takeoffOATInput, takeoffSurfaceInput, takeoffElevationInput, takeoffWindInput].forEach(el => {
+                el.addEventListener('input', () => {
+                    updateTakeoffPerformance();
+                    updateCruisePerformance();
+                });
+            });
+            [cruiseAltitudeInput, windsAloftInput].forEach(el => {
+                el.addEventListener('input', updateCruisePerformance);
+            });
+            [landingWeightInput, landingOATInput, landingSurfaceInput, landingElevationInput, landingWindInput].forEach(el => {
+                el.addEventListener('input', updateLandingPerformance);
+            });
+
+            // Initial calculation
+            updateTakeoffPerformance();
+            updateCruisePerformance();
+            updateLandingPerformance();
+            // Performance Calculator elements are now part of the new tabbed interface
+
+
+
+                        function initializePerformanceCharts() {
+                                // Load user edits from localStorage if available
+                                const savedClimb = localStorage.getItem('climbPerformanceData');
+                                const savedTakeoff = localStorage.getItem('takeoffPerformanceData');
+                                const savedLanding = localStorage.getItem('landingPerformanceData');
+                                window.liveChartData = savedClimb ? JSON.parse(savedClimb) : initialPerformanceData.slice();
+                                window.liveTakeoffData = savedTakeoff ? JSON.parse(savedTakeoff) : takeoffPerformance.slice();
+                                window.liveLandingData = savedLanding ? JSON.parse(savedLanding) : landingPerformance.slice();
+                                console.log('Initializing charts:', {
+                                    climb: window.liveChartData,
+                                    takeoff: window.liveTakeoffData,
+                                    landing: window.liveLandingData
+                                });
+                                renderChart();
+                        }
+
+            // ...existing code...
+            // Ensure charts are initialized after all definitions
+            initializePerformanceCharts();
+
+            // All element declarations are now inside DOMContentLoaded
 
             // --- Tab Switching Logic ---
             function switchTab(tab) {
@@ -250,21 +611,26 @@
              * @returns {number} The estimated value.
              */
             function getValueFromChartData(altitude, dataType) {
-                if (altitude < liveChartData[0].altitude) return liveChartData[0][dataType];
-                if (altitude > liveChartData[liveChartData.length - 1].altitude) {
-                    return liveChartData[liveChartData.length - 1][dataType];
+                if (!window.liveChartData || window.liveChartData.length === 0) return 0;
+                if (altitude < window.liveChartData[0].altitude) {
+                    const value = window.liveChartData[0][dataType];
+                    return dataType === 'rate' ? value * window.propPitchBias : value;
+                }
+                if (altitude > window.liveChartData[window.liveChartData.length - 1].altitude) {
+                    const value = window.liveChartData[window.liveChartData.length - 1][dataType];
+                    return dataType === 'rate' ? value * window.propPitchBias : value;
                 }
 
-                for (let i = 0; i < liveChartData.length - 1; i++) {
-                    const p1 = liveChartData[i];
-                    const p2 = liveChartData[i + 1];
+                for (let i = 0; i < window.liveChartData.length - 1; i++) {
+                    const p1 = window.liveChartData[i];
+                    const p2 = window.liveChartData[i + 1];
                     if (altitude >= p1.altitude && altitude <= p2.altitude) {
                         const altitudeFraction = (altitude - p1.altitude) / (p2.altitude - p1.altitude);
                         const interpolatedValue = p1[dataType] + altitudeFraction * (p2[dataType] - p1[dataType]);
-                        return interpolatedValue;
+                        return dataType === 'rate' ? interpolatedValue * window.propPitchBias : interpolatedValue;
                     }
                 }
-                return liveChartData[liveChartData.length - 1][dataType];
+                return window.liveChartData[window.liveChartData.length - 1][dataType];
             }
 
 
@@ -280,55 +646,39 @@
             }
 
             /**
-             * Generates the performance chart table rows.
+             * Generates the performance chart table rows and new distance charts.
              */
-            function renderChart() {
-                chartBody.innerHTML = ''; // Clear existing rows
-
-                liveChartData.forEach((dataPoint, index) => {
+                        function renderChart() {
+                                if (!window.chartBody || !window.takeoffDistanceBody || !window.landingDistanceBody) {
+                                    console.error('Chart containers not found:', { chartBody: window.chartBody, takeoffDistanceBody: window.takeoffDistanceBody, landingDistanceBody: window.landingDistanceBody });
+                                    return;
+                                }
+                window.chartBody.innerHTML = '';
+                window.takeoffDistanceBody.innerHTML = '';
+                window.landingDistanceBody.innerHTML = '';                // Main climb chart (editable)
+                window.liveChartData.forEach((dataPoint, index) => {
                     const tas = getTrueAirspeed(dataPoint.kias, dataPoint.altitude);
                     const speedNmPerMin = tas / 60;
                     const climbGradient = speedNmPerMin > 0 ? dataPoint.rate / speedNmPerMin : 0;
-
                     const row = document.createElement('tr');
                     row.className = 'border-b border-gray-200 hover:bg-gray-50';
-
                     row.innerHTML = `
                         <td class="py-3 px-2 font-semibold">${dataPoint.altitude.toLocaleString()}</td>
-                        <td class="py-3 px-2">
-                            <div class="flex items-center space-x-2">
-                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
-                                    data-action="decrement" data-type="kias" data-increment="1" data-index="${index}">-</button>
-                                <input type="number" value="${dataPoint.kias}" data-index="${index}" data-type="kias"
-                                    class="w-16 text-center bg-transparent border-none focus:outline-none focus:bg-gray-100 rounded-lg">
-                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
-                                    data-action="increment" data-type="kias" data-increment="1" data-index="${index}">+</button>
-                            </div>
-                        </td>
-                        <td class="py-3 px-2">
-                            <div class="flex items-center space-x-2">
-                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
-                                    data-action="decrement" data-type="rate" data-increment="10" data-index="${index}">-</button>
-                                <input type="number" value="${dataPoint.rate}" data-index="${index}" data-type="rate"
-                                    class="w-16 text-center bg-transparent border-none focus:outline-none focus:bg-gray-100 rounded-lg">
-                                <button class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-bold"
-                                    data-action="increment" data-type="rate" data-increment="10" data-index="${index}">+</button>
-                            </div>
-                        </td>
-                        <td class="py-3 px-2">${Math.round(tas)}</td>
-                        <td class="py-3 px-2">${Math.round(climbGradient)}</td>
+                        <td class="py-3 px-2 text-center">${dataPoint.kias}</td>
+                        <td class="py-3 px-2 text-center">${dataPoint.rate}</td>
+                        <td class="py-3 px-2 text-center">${Math.round(tas)}</td>
+                        <td class="py-3 px-2 text-center">${Math.round(climbGradient)}</td>
                     `;
-                    chartBody.appendChild(row);
-
-                    // Add event listeners to editable fields and buttons
+                    window.chartBody.appendChild(row);
+                    // ...existing code for event listeners...
                     const rateInput = row.querySelector('input[data-type="rate"]');
                     if (rateInput) {
                         rateInput.addEventListener('input', (e) => {
                             const newRate = parseFloat(e.target.value);
                             const dataIndex = parseInt(e.target.dataset.index, 10);
                             if (!isNaN(newRate)) {
-                                liveChartData[dataIndex].rate = newRate;
-                                renderChart(); // Re-render the chart with new data
+                                window.liveChartData[dataIndex].rate = newRate;
+                                renderChart();
                             }
                         });
                     }
@@ -338,201 +688,136 @@
                             const newIas = parseFloat(e.target.value);
                             const dataIndex = parseInt(e.target.dataset.index, 10);
                             if (!isNaN(newIas)) {
-                                liveChartData[dataIndex].kias = newIas;
-                                renderChart(); // Re-render the chart with new data
+                                window.liveChartData[dataIndex].kias = newIas;
+                                renderChart();
                             }
                         });
                     }
                 });
 
-                // Attach event listeners to all buttons
-                document.querySelectorAll('button[data-action]').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const action = e.target.dataset.action;
-                        const dataType = e.target.dataset.type;
-                        const increment = parseFloat(e.target.dataset.increment);
-                        const index = parseInt(e.target.dataset.index, 10);
-                        let currentValue = liveChartData[index][dataType];
-                        
-                        if (action === 'increment') {
-                            liveChartData[index][dataType] = currentValue + increment;
-                        } else if (action === 'decrement') {
-                            liveChartData[index][dataType] = currentValue - increment;
-                        }
-                        renderChart();
-                    });
+                // Takeoff Distance Chart (editable)
+                window.liveTakeoffData.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-200 hover:bg-blue-50';
+                    tr.innerHTML = `
+                        <td class="py-3 px-2 font-semibold">${row.altitude}</td>
+                        <td class="py-3 px-2 text-center">${row.groundRoll}</td>
+                        <td class="py-3 px-2 text-center">${row.over50ft}</td>
+                    `;
+                    window.takeoffDistanceBody.appendChild(tr);
                 });
+
+                // Landing Distance Chart (editable)
+                window.liveLandingData.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-200 hover:bg-green-50';
+                    tr.innerHTML = `
+                        <td class="py-3 px-2 font-semibold">${row.altitude}</td>
+                        <td class="py-3 px-2 text-center">${row.groundRoll}</td>
+                        <td class="py-3 px-2 text-center">${row.over50ft}</td>
+                    `;
+                    window.landingDistanceBody.appendChild(tr);
+                });
+                console.log('Charts rendered.');
             }
             
-            // --- Calculation Logic for Tab 2 ---
-            calculateBtn.addEventListener('click', function () {
-                const startAlt = parseFloat(startAltInput.value);
-                const endAlt = parseFloat(endAltInput.value);
-                const wind = parseFloat(windInput.value);
-
-                // Input Validation
-                messageBox.classList.add('hidden');
-                analysisResultDiv.classList.add('hidden');
-                analyzeBtn.disabled = true;
-
-                if (isNaN(startAlt) || isNaN(endAlt) || isNaN(wind)) {
-                    showMessage('Please enter valid numbers for all fields.', 'error');
-                    resultSection.classList.add('hidden');
-                    return;
-                }
-                if (startAlt >= endAlt) {
-                    showMessage('Ending altitude must be greater than starting altitude.', 'error');
-                    resultSection.classList.add('hidden');
-                    return;
-                }
-                if (startAlt < 0 || endAlt < 0) {
-                    showMessage('Altitudes cannot be negative.', 'error');
-                    resultSection.classList.add('hidden');
-                    return;
-                }
-
-                let totalTimeMinutes = 0;
-                let totalDistanceNm = 0;
-                const altitudeIncrement = 100;
-
-                for (let alt = startAlt; alt < endAlt; alt += altitudeIncrement) {
-                    const currentAlt = alt;
-                    const nextAlt = Math.min(alt + altitudeIncrement, endAlt);
-                    const segmentAltitudeChange = nextAlt - currentAlt;
-
-                    const rate1 = getValueFromChartData(currentAlt, 'rate');
-                    const rate2 = getValueFromChartData(nextAlt, 'rate');
-                    const avgRate = (rate1 + rate2) / 2;
-
-                    const ias1 = getValueFromChartData(currentAlt, 'kias');
-                    const ias2 = getValueFromChartData(nextAlt, 'kias');
-                    const tas1 = getTrueAirspeed(ias1, currentAlt);
-                    const tas2 = getTrueAirspeed(ias2, nextAlt);
-                    const avgTas = (tas1 + tas2) / 2;
-                    
-                    if (avgRate <= 0) {
-                        showMessage(`Climb is not possible at altitudes above ${currentAlt} ft with this performance data.`, 'error');
-                        return;
-                    }
-
-                    const segmentTimeMinutes = segmentAltitudeChange / avgRate;
-                    const groundSpeed = avgTas - wind;
-                    const segmentDistanceNm = (groundSpeed / 60) * segmentTimeMinutes;
-
-                    totalTimeMinutes += segmentTimeMinutes;
-                    totalDistanceNm += segmentDistanceNm;
-                }
-
-                const averageGradient = totalDistanceNm > 0 ? (endAlt - startAlt) / totalDistanceNm : 0;
-                const totalSeconds = Math.round(totalTimeMinutes * 60);
-                const minutes = Math.floor(totalSeconds / 60);
-                const seconds = totalSeconds % 60;
-
-                // Display Results
-                timeResult.textContent = `${minutes} min ${seconds} sec`;
-                gradientResult.textContent = `${Math.round(averageGradient)} ft/nm`;
-                resultSection.classList.remove('hidden');
-                analyzeBtn.disabled = false;
-            });
-            
-            // --- Gemini API Integration for Analysis ---
-            analyzeBtn.addEventListener('click', async function() {
-                analyzeBtn.disabled = true;
-                analysisResultDiv.innerHTML = '<p class="text-center text-gray-500">Analyzing...</p>';
-                analysisResultDiv.classList.remove('hidden');
-
-                const startAlt = startAltInput.value;
-                const endAlt = endAltInput.value;
-                const wind = windInput.value;
-                const timeStr = timeResult.textContent;
-                const gradientStr = gradientResult.textContent;
-
-                const userQuery = `Analyze the following flight climb performance data and provide a concise summary in a single paragraph. The climb is from ${startAlt} to ${endAlt} feet with an average wind of ${wind} knots. The calculated time to climb is ${timeStr}, and the average climb gradient is ${gradientStr}.`;
-                
-                const apiKey = "" 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    tools: [{ "google_search": {} }],
-                    systemInstruction: {
-                        parts: [{ text: "Act as an experienced flight instructor and provide a brief, professional summary of the climb performance data provided by the user. Do not give any technical values, just interpret the results in plain, easy-to-understand language." }]
-                    },
-                };
-                
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`API response was not ok: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    const analysisText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                    
-                    if (analysisText) {
-                        analysisResultDiv.innerHTML = `<p>${analysisText}</p>`;
-                    } else {
-                        analysisResultDiv.innerHTML = '<p class="text-center text-red-500">Analysis failed. Please try again.</p>';
-                    }
-
-                } catch (error) {
-                    console.error('Error during Gemini API call:', error);
-                    analysisResultDiv.innerHTML = '<p class="text-center text-red-500">Analysis failed. Please check the console for details.</p>';
-                } finally {
-                    analyzeBtn.disabled = false;
-                }
-            });
+            // Calculation logic is now handled by updateTakeoffPerformance, updateCruisePerformance, and updateLandingPerformance functions
 
             // Add event listeners for save and reset buttons
             saveDataBtn.addEventListener('click', function() {
-                localStorage.setItem('performanceChartData', JSON.stringify(liveChartData));
+                localStorage.setItem('climbPerformanceData', JSON.stringify(window.liveChartData));
+                localStorage.setItem('takeoffPerformanceData', JSON.stringify(window.liveTakeoffData));
+                localStorage.setItem('landingPerformanceData', JSON.stringify(window.liveLandingData));
                 showMessage('Performance data saved successfully!', 'success');
             });
 
-            resetDataBtn.addEventListener('click', function() {
-                localStorage.removeItem('performanceChartData');
-                liveChartData.splice(0, liveChartData.length, ...initialPerformanceData);
-                renderChart();
+            resetDataBtn.addEventListener('click', async function() {
+                localStorage.removeItem('climbPerformanceData');
+                localStorage.removeItem('takeoffPerformanceData');
+                localStorage.removeItem('landingPerformanceData');
+                await initializePerformanceCharts();
                 showMessage('Performance data reset to default values.', 'success');
             });
+            // Removed all weight adjustment logic and buttons for Performance Chart tab
 
-            // Add event listeners for takeoff weight changes
-            const takeoffWeightInput = document.getElementById('takeoff-weight');
+            // Add event listener for prop pitch bias slider
+            const propPitchSlider = document.getElementById('prop-pitch-bias');
+            const propPitchValue = document.getElementById('prop-pitch-value');
             
-            function validateAndUpdateWeight(weight) {
-                const validatedWeight = Math.min(Math.max(weight, 1400), 1700);
-                takeoffWeightInput.value = validatedWeight;
-                updatePerformanceForWeight(validatedWeight);
+            if (propPitchSlider) {
+                // Load saved bias if exists
+                const savedBias = localStorage.getItem('propPitchBias');
+                if (savedBias !== null) {
+                    const biasValue = parseInt(savedBias);
+                    propPitchSlider.value = biasValue;
+                    window.propPitchBias = biasValue / 100;
+                    propPitchValue.textContent = biasValue + '%';
+                }
+
+                propPitchSlider.addEventListener('input', function() {
+                    const value = parseInt(this.value);
+                    propPitchValue.textContent = value + '%';
+
+                    // Calculate bias factors
+                    const climbBias = (200 - value) / 100; // 120% becomes 0.8 (worse climb), 80% becomes 1.2 (better climb)
+                    const takeoffBias = 2 - climbBias; // inverse effect for distances
+                    const landingBias = 1 + (takeoffBias - 1) * 0.5; // half effect for landing
+
+                    // Update climb performance data
+                    window.liveChartData = initialPerformanceData.map(row => ({
+                        ...row,
+                        rate: Math.round(row.rate * climbBias)
+                    }));
+
+                    // Update takeoff distance data
+                    window.liveTakeoffData = takeoffPerformance.map(row => ({
+                        ...row,
+                        groundRoll: Math.round(row.groundRoll * takeoffBias),
+                        over50ft: Math.round(row.over50ft * takeoffBias)
+                    }));
+
+                    // Update landing distance data
+                    window.liveLandingData = landingPerformance.map(row => ({
+                        ...row,
+                        groundRoll: Math.round(row.groundRoll * landingBias),
+                        over50ft: Math.round(row.over50ft * landingBias)
+                    }));
+
+                    renderChart();
+                    // Update all performance calculations
+                    updateTakeoffPerformance();
+                    updateCruisePerformance();
+                    updateLandingPerformance();
+                });
             }
 
-            takeoffWeightInput.addEventListener('input', function() {
-                const weight = parseFloat(this.value);
-                if (!isNaN(weight)) {
-                    validateAndUpdateWeight(weight);
-                }
-            });
+            if (saveDataBtn) {
+                saveDataBtn.addEventListener('click', function() {
+                    localStorage.setItem('propPitchBias', propPitchSlider.value);
+                    localStorage.setItem('climbPerformanceData', JSON.stringify(window.liveChartData));
+                    localStorage.setItem('takeoffPerformanceData', JSON.stringify(window.liveTakeoffData));
+                    localStorage.setItem('landingPerformanceData', JSON.stringify(window.liveLandingData));
+                    showMessage('Performance data saved successfully!', 'success');
+                });
+            }
 
-            // Add event listeners for weight adjustment buttons
-            document.querySelector('button[data-action="increment-weight"]').addEventListener('click', function() {
-                const currentWeight = parseFloat(takeoffWeightInput.value) || 1700;
-                const increment = parseFloat(this.dataset.increment);
-                validateAndUpdateWeight(currentWeight + increment);
-            });
+            if (resetDataBtn) {
+                resetDataBtn.addEventListener('click', async function() {
+                    localStorage.removeItem('propPitchBias');
+                    localStorage.removeItem('climbPerformanceData');
+                    localStorage.removeItem('takeoffPerformanceData');
+                    localStorage.removeItem('landingPerformanceData');
+                    propPitchSlider.value = 100;
+                    window.propPitchBias = 1.0;
+                    propPitchValue.textContent = '100%';
+                    await initializePerformanceCharts();
+                    showMessage('Performance data reset to default values.', 'success');
+                });
+            }
 
-            document.querySelector('button[data-action="decrement-weight"]').addEventListener('click', function() {
-                const currentWeight = parseFloat(takeoffWeightInput.value) || 1700;
-                const increment = parseFloat(this.dataset.increment);
-                validateAndUpdateWeight(currentWeight - increment);
-            });
-
-            // Initial rendering of the chart with default weight (1700 lbs)
-            renderChart();
+            // Initial rendering of the chart with default values
+            initializePerformanceCharts();
         });
-    </script>
+</script>
 </body>
 </html>
