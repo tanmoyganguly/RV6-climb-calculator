@@ -21,6 +21,41 @@
             -webkit-appearance: none;
             margin: 0;
         }
+        .info-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            border: none;
+            vertical-align: middle;
+        }
+        .tooltip {
+            display: none;
+            position: fixed;
+            background-color: #1f2937;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            max-width: 280px;
+            z-index: 1000;
+            font-size: 10px;
+            line-height: 1.4;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tooltip.visible {
+            display: block;
+        }
+        .info-button:focus + .tooltip {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
@@ -196,9 +231,9 @@
                         <label for="takeoff-elevation" class="block text-sm font-medium text-gray-700 mb-1">Takeoff Elevation (ft)</label>
                         <div class="relative">
                             <input type="number" id="takeoff-elevation" value="0" min="0" 
-                                class="w-full p-3 border border-gray-300 rounded-lg"
+                                class="w-full p-3 pr-24 border border-gray-300 rounded-lg"
                                 title="Field elevation affects density altitude and true airspeed. Higher elevations reduce performance based on the standard lapse rate.">
-                            <span id="takeoff-da-display" class="absolute right-3 top-3 text-sm text-gray-500"></span>
+                            <span id="takeoff-da-display" class="absolute right-8 top-2 text-[10px] leading-tight text-gray-500 bg-white/95 px-1 py-0.5 rounded-sm whitespace-nowrap"></span>
                         </div>
                     </div>
                     <div>
@@ -233,9 +268,9 @@
                         <label for="cruise-altitude" class="block text-sm font-medium text-gray-700 mb-1">Cruise Altitude (ft)</label>
                         <div class="relative">
                             <input type="number" id="cruise-altitude" value="5000" min="0" 
-                                class="w-full p-3 border border-gray-300 rounded-lg"
+                                class="w-full p-3 pr-24 border border-gray-300 rounded-lg"
                                 title="Target altitude for the climb. Climb performance decreases with altitude according to the performance chart. Maximum practical ceiling around 18,000 ft.">
-                            <span id="cruise-da-display" class="absolute right-3 top-3 text-sm text-gray-500"></span>
+                            <span id="cruise-da-display" class="absolute right-8 top-2 text-[10px] leading-tight text-gray-500 bg-white/95 px-1 py-0.5 rounded-sm whitespace-nowrap"></span>
                         </div>
                     </div>
                     <div>
@@ -295,9 +330,9 @@
                         <label for="landing-elevation" class="block text-sm font-medium text-gray-700 mb-1">Landing Elevation (ft)</label>
                         <div class="relative">
                             <input type="number" id="landing-elevation" value="0" min="0" 
-                                class="w-full p-3 border border-gray-300 rounded-lg"
+                                class="w-full p-3 pr-24 border border-gray-300 rounded-lg"
                                 title="Field elevation affects density altitude and true airspeed. Higher elevations increase landing distance based on the standard lapse rate.">
-                            <span id="landing-da-display" class="absolute right-3 top-3 text-sm text-gray-500"></span>
+                            <span id="landing-da-display" class="absolute right-8 top-2 text-[10px] leading-tight text-gray-500 bg-white/95 px-1 py-0.5 rounded-sm whitespace-nowrap"></span>
                         </div>
                     </div>
                     <div>
@@ -1063,6 +1098,98 @@
 
             // Initial rendering of the chart with default values
             initializePerformanceCharts();
+
+            // Tooltip handling
+            function createTooltip(text) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = text;
+                return tooltip;
+            }
+
+            function createInfoButton() {
+                const button = document.createElement('button');
+                button.className = 'info-button';
+                button.innerHTML = 'i';
+                button.setAttribute('type', 'button');
+                return button;
+            }
+
+            function setupTooltips() {
+                document.querySelectorAll('[title]').forEach(element => {
+                    const tooltipText = element.getAttribute('title');
+                    element.removeAttribute('title');
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'flex';
+                    wrapper.style.alignItems = 'center';
+                    
+                    // If the element is an input, wrap it
+                    if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
+                        element.parentNode.insertBefore(wrapper, element);
+                        wrapper.appendChild(element);
+                    } else {
+                        element.parentNode.replaceChild(wrapper, element);
+                        wrapper.appendChild(element);
+                    }
+                    
+                    const infoButton = createInfoButton();
+                    const tooltip = createTooltip(tooltipText);
+                    wrapper.appendChild(infoButton);
+                    wrapper.appendChild(tooltip);
+
+                    let activeTooltip = null;
+                    
+                    infoButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (activeTooltip) {
+                            activeTooltip.classList.remove('visible');
+                        }
+                        if (activeTooltip !== tooltip) {
+                            tooltip.classList.add('visible');
+                            
+                            // Position the tooltip
+                            const rect = infoButton.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            const spaceRight = window.innerWidth - rect.right;
+                            
+                            if (spaceBelow < 200 && rect.top > 200) {
+                                // Show above if not enough space below
+                                tooltip.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
+                                tooltip.style.top = 'auto';
+                            } else {
+                                // Show below
+                                tooltip.style.top = (rect.bottom + 10) + 'px';
+                                tooltip.style.bottom = 'auto';
+                            }
+                            
+                            if (spaceRight < 200) {
+                                // Align right edge with button if near right edge
+                                tooltip.style.right = (window.innerWidth - rect.right) + 'px';
+                                tooltip.style.left = 'auto';
+                            } else {
+                                // Align left edge with button
+                                tooltip.style.left = rect.left + 'px';
+                                tooltip.style.right = 'auto';
+                            }
+                            
+                            activeTooltip = tooltip;
+                        } else {
+                            activeTooltip = null;
+                        }
+                    });
+                });
+
+                // Close tooltip when clicking outside
+                document.addEventListener('click', () => {
+                    const visibleTooltips = document.querySelectorAll('.tooltip.visible');
+                    visibleTooltips.forEach(t => t.classList.remove('visible'));
+                    activeTooltip = null;
+                });
+            }
+
+            // Initialize tooltips
+            setupTooltips();
         });
 </script>
 </body>
