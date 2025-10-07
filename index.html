@@ -195,11 +195,19 @@
                 <div class="flex items-center space-x-4 mb-3">
                     <span class="text-sm text-gray-600 whitespace-nowrap">0%</span>
                     <input type="range" id="safety-factor" 
-                        min="0" max="50" value="0" step="5"
+                        min="0" max="100" value="25" step="5"
                         class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                         title="Add a safety margin to takeoff and landing distances. This helps account for non-ideal conditions and pilot technique.">
-                    <span class="text-sm text-gray-600 whitespace-nowrap">50%</span>
-                    <span id="safety-factor-value" class="text-sm font-semibold bg-green-100 px-2 py-1 rounded">0%</span>
+                    <span class="text-sm text-gray-600 whitespace-nowrap">100%</span>
+                    <span id="safety-factor-value" class="text-sm font-semibold bg-green-100 px-2 py-1 rounded">25%</span>
+                </div>
+                <div class="flex justify-end space-x-2 mt-2">
+                    <button id="save-calculator-btn" class="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        💾 Save Settings
+                    </button>
+                    <button id="reset-calculator-btn" class="px-4 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        ↺ Reset to Default
+                    </button>
                 </div>
             </div>
             <!-- TAKEOFF Section -->
@@ -794,13 +802,18 @@
                 document.getElementById('cruise-da-display').textContent = `DA: ${da.toLocaleString()} ft`;
             }
 
+            // Function to update all calculations
+            function updateAllCalculations() {
+                updateTakeoffPerformance();
+                updateTakeoffDADisplay();
+                updateCruisePerformance();
+                updateCruiseDADisplay();
+                updateLandingPerformance();
+                updateLandingDADisplay();
+            }
+
             // Initial calculation
-            updateTakeoffPerformance();
-            updateTakeoffDADisplay();
-            updateCruisePerformance();
-            updateCruiseDADisplay();
-            updateLandingPerformance();
-            updateLandingDADisplay();
+            updateAllCalculations();
             // Performance Calculator elements are now part of the new tabbed interface
 
 
@@ -1095,6 +1108,78 @@
                     updateLandingPerformance();
                 });
             }
+
+            // Calculator Save/Reset functionality
+            const calculatorFields = {
+                'takeoff-weight-input': 1700,
+                'takeoff-oat': 15,
+                'takeoff-surface': 'paved',
+                'takeoff-elevation': 0,
+                'takeoff-wind': 0,
+                'cruise-altitude': 5000,
+                'winds-aloft': 0,
+                'landing-weight': 1700,
+                'landing-oat': 15,
+                'landing-surface': 'paved',
+                'landing-elevation': 0,
+                'landing-wind': 0,
+                'safety-factor': 25
+            };
+
+            function saveCalculatorSettings() {
+                const settings = {};
+                Object.keys(calculatorFields).forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        settings[fieldId] = element.value;
+                    }
+                });
+                localStorage.setItem('calculatorSettings', JSON.stringify(settings));
+                showMessage('Calculator settings saved successfully!', 'success');
+            }
+
+            function resetCalculatorSettings() {
+                Object.entries(calculatorFields).forEach(([fieldId, defaultValue]) => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.value = defaultValue;
+                    }
+                });
+                localStorage.removeItem('calculatorSettings');
+                // Update all calculations after resetting values
+                updateAllCalculations();
+                showMessage('Calculator settings reset to default values.', 'success');
+            }
+
+            function loadCalculatorSettings() {
+                const savedSettings = localStorage.getItem('calculatorSettings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    Object.keys(settings).forEach(fieldId => {
+                        const element = document.getElementById(fieldId);
+                        if (element) {
+                            element.value = settings[fieldId];
+                        }
+                    });
+                }
+                // Update all calculations after loading values
+                updateAllCalculations();
+            }
+
+            // Add event listeners for calculator save/reset buttons
+            const saveCalculatorBtn = document.getElementById('save-calculator-btn');
+            const resetCalculatorBtn = document.getElementById('reset-calculator-btn');
+
+            if (saveCalculatorBtn) {
+                saveCalculatorBtn.addEventListener('click', saveCalculatorSettings);
+            }
+
+            if (resetCalculatorBtn) {
+                resetCalculatorBtn.addEventListener('click', resetCalculatorSettings);
+            }
+
+            // Load saved calculator settings on page load
+            loadCalculatorSettings();
 
             // Initial rendering of the chart with default values
             initializePerformanceCharts();
