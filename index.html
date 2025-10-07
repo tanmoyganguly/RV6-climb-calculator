@@ -473,7 +473,9 @@
                 const pressureAltitude = getPressureAltitude(elevation);
                 const isaTemp = getStandardTemp(elevation);
                 // DA = PA + [120 × (OAT - ISA)]
-                return Math.round(pressureAltitude + (120 * (oat - isaTemp)));
+                const densityAlt = Math.round(pressureAltitude + (120 * (oat - isaTemp)));
+                console.log(`DA Calculation - Elev: ${elevation}ft, OAT: ${oat}°C, ISA: ${isaTemp}°C, PA: ${pressureAltitude}ft, DA: ${densityAlt}ft`);
+                return densityAlt;
             }
 
             function getCruiseDensityAltitude(cruiseAlt, takeoffElev, takeoffOAT) {
@@ -507,12 +509,23 @@
                 const surface = takeoffSurfaceInput.value;
                 const elevation = parseFloat(takeoffElevationInput.value);
                 const wind = parseFloat(takeoffWindInput.value);
+                
+                console.log(`\nTakeoff Performance Update:`);
+                console.log(`Input - Weight: ${weight}lbs, OAT: ${oat}°C, Surface: ${surface}, Elevation: ${elevation}ft, Wind: ${wind}kts`);
                 // Calculate density altitude for performance lookup
                 const densityAlt = getDensityAltitude(elevation, oat);
                 // Lookup base performance using density altitude
                 let perf = lookupPerformance((window.liveTakeoffData && window.liveTakeoffData.length > 0) ? window.liveTakeoffData : takeoffPerformance, densityAlt, 'takeoff');
-                let groundRoll = Math.round(perf.groundRoll * surfaceFactor(surface) * windFactor(wind) * weightFactor(weight));
-                let over50ft = Math.round(perf.over50ft * surfaceFactor(surface) * windFactor(wind) * weightFactor(weight));
+                console.log(`Base performance:`, perf);
+                
+                const sfactor = surfaceFactor(surface);
+                const wfactor = windFactor(wind);
+                const wtfactor = weightFactor(weight);
+                console.log(`Adjustment factors - Surface: ${sfactor}, Wind: ${wfactor}, Weight: ${wtfactor}`);
+                
+                let groundRoll = Math.round(perf.groundRoll * sfactor * wfactor * wtfactor);
+                let over50ft = Math.round(perf.over50ft * sfactor * wfactor * wtfactor);
+                console.log(`Final values - Ground Roll: ${groundRoll}ft, Over 50ft: ${over50ft}ft`);
                 
                 // Display base values
                 takeoffPerfResult.textContent = `${groundRoll} ft`;
@@ -599,6 +612,9 @@
                 const surface = landingSurfaceInput.value;
                 const elevation = parseFloat(landingElevationInput.value);
                 const wind = parseFloat(landingWindInput.value);
+                
+                console.log(`\nLanding Performance Update:`);
+                console.log(`Input - Weight: ${weight}lbs, OAT: ${oat}°C, Surface: ${surface}, Elevation: ${elevation}ft, Wind: ${wind}kts`);
                 // Calculate density altitude for performance lookup
                 const densityAlt = getDensityAltitude(elevation, oat);
                 // Lookup base performance using density altitude
@@ -627,7 +643,9 @@
                 if (densityAlt >= 0) return baseValue;
                 // For negative DA, improve performance by 2% per 10 degrees below standard
                 // -120ft DA represents approximately -1°C from standard
+                // We only want to apply the improvement for actual cold temperatures
                 const degreesBelowStandard = -densityAlt / 120;
+                if (degreesBelowStandard <= 0) return baseValue;  // Don't adjust if not actually colder
                 const performanceImprovement = 1 - (degreesBelowStandard * 0.02 / 10);
                 return Math.round(baseValue * performanceImprovement);
             }
@@ -652,8 +670,24 @@
                     };
                 }
                 
+                // First check for exact match to prevent interpolation errors
+                const exactMatch = perfArr.find(p => p.altitude === densityAlt);
+                console.log(`Looking up performance for DA: ${densityAlt}ft`);
+                console.log(`Performance array:`, perfArr);
+                console.log(`Exact match found:`, exactMatch);
+                console.log(`Prop pitch bias:`, window.propPitchBias, `Distance bias:`, distanceBias);
+                
+                if (exactMatch) {
+                    const result = {
+                        groundRoll: Math.round(exactMatch.groundRoll * distanceBias),
+                        over50ft: Math.round(exactMatch.over50ft * distanceBias)
+                    };
+                    console.log(`Exact match result:`, result);
+                    return result;
+                }
+                
                 for (let i = 0; i < perfArr.length-1; i++) {
-                    if (densityAlt >= perfArr[i].altitude && densityAlt <= perfArr[i+1].altitude) {
+                    if (densityAlt > perfArr[i].altitude && densityAlt < perfArr[i+1].altitude) {
                         const frac = (densityAlt - perfArr[i].altitude) / (perfArr[i+1].altitude - perfArr[i].altitude);
                         const baseGroundRoll = perfArr[i].groundRoll + frac * (perfArr[i+1].groundRoll - perfArr[i].groundRoll);
                         const baseOver50ft = perfArr[i].over50ft + frac * (perfArr[i+1].over50ft - perfArr[i].over50ft);
