@@ -772,22 +772,20 @@
             }
 
             // --- Event listeners for all inputs ---
+            function handleWindInput(e) {
+                let value = e.target.value;
+                if (value === '-' || value === '+') {
+                    return; // Allow single sign input
+                }
+                const sign = value.startsWith('-') ? '-' : (value.startsWith('+') ? '+' : '');
+                const numbers = value.replace(/[^0-9]/g, '');
+                e.target.value = sign + numbers;
+            }
+
             [takeoffWeightInput2, takeoffOATInput, takeoffSurfaceInput, takeoffElevationInput, takeoffWindInput].forEach(el => {
                 el.addEventListener('input', (e) => {
-                    // For wind inputs, allow only numbers and a single leading + or -
                     if (e.target.id.includes('wind')) {
-                        let value = e.target.value;
-                        // Allow a minus sign to be typed at the current cursor position
-                        if (value === '-') {
-                            // Don't modify single minus sign
-                            return;
-                        }
-                        // Remove any non-digit/sign characters
-                        value = value.replace(/[^\d+-]/g, '');
-                        // Keep only one sign character at the start
-                        const numbers = value.replace(/[+-]/g, '');
-                        const sign = value.match(/^[+-]/) ? value.match(/^[+-]/)[0] : '';
-                        e.target.value = sign + numbers;
+                        handleWindInput(e);
                     }
                     updateTakeoffPerformance();
                     updateTakeoffDADisplay();
@@ -796,13 +794,19 @@
                 });
             });
             [cruiseAltitudeInput, windsAloftInput].forEach(el => {
-                el.addEventListener('input', () => {
+                el.addEventListener('input', (e) => {
+                    if (e.target.id.includes('wind')) {
+                        handleWindInput(e);
+                    }
                     updateCruisePerformance();
                     updateCruiseDADisplay();
                 });
             });
             [landingWeightInput, landingOATInput, landingSurfaceInput, landingElevationInput, landingWindInput].forEach(el => {
-                el.addEventListener('input', () => {
+                el.addEventListener('input', (e) => {
+                    if (e.target.id.includes('wind')) {
+                        handleWindInput(e);
+                    }
                     updateLandingPerformance();
                     updateLandingDADisplay();
                 });
