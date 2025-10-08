@@ -264,10 +264,10 @@
                     </div>
                     <div>
                         <label for="takeoff-wind" class="block text-sm font-medium text-gray-700 mb-1">Winds at Takeoff (knots, +/-)</label>
-                        <input type="text" inputmode="numeric" pattern="[+-]?\d*" id="takeoff-wind" value="0" 
+                        <input type="text" inputmode="decimal" pattern="-?\d*" id="takeoff-wind" value="0" 
                             class="w-full p-3 border border-gray-300 rounded-lg"
                             title="Wind effect: Headwind (+) decreases distance by 10% per 10 knots. Tailwind (-) increases distance by 10% per 2 knots."
-                            placeholder="+/- knots">
+                            placeholder="Enter -10 for 10kt tailwind">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -301,10 +301,10 @@
                     </div>
                     <div>
                         <label for="winds-aloft" class="block text-sm font-medium text-gray-700 mb-1">Winds Aloft (knots, +/-)</label>
-                        <input type="text" inputmode="numeric" pattern="[+-]?\d*" id="winds-aloft" value="0" 
+                        <input type="text" inputmode="decimal" pattern="-?\d*" id="winds-aloft" value="0" 
                             class="w-full p-3 border border-gray-300 rounded-lg"
                             title="Winds at cruise altitude. Wind is interpolated between takeoff and cruise altitude. Positive = headwind, Negative = tailwind. Affects ground speed and distance calculations."
-                            placeholder="+/- knots">
+                            placeholder="Enter -10 for 10kt tailwind">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -368,10 +368,10 @@
                     </div>
                     <div>
                         <label for="landing-wind" class="block text-sm font-medium text-gray-700 mb-1">Winds at Landing (knots, +/-)</label>
-                        <input type="text" inputmode="numeric" pattern="[+-]?\d*" id="landing-wind" value="0" 
+                        <input type="text" inputmode="decimal" pattern="-?\d*" id="landing-wind" value="0" 
                             class="w-full p-3 border border-gray-300 rounded-lg"
                             title="Wind effect: Headwind (+) decreases distance by 10% per 10 knots. Tailwind (-) increases distance by 10% per 2 knots. Same factors as takeoff."
-                            placeholder="+/- knots">
+                            placeholder="Enter -10 for 10kt tailwind">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -813,12 +813,17 @@
             // --- Event listeners for all inputs ---
             function handleWindInput(e) {
                 let value = e.target.value;
-                if (value === '-' || value === '+') {
-                    return; // Allow single sign input
+                // Always allow empty string and lone minus sign
+                if (value === '' || value === '-') {
+                    return;
                 }
-                const sign = value.startsWith('-') ? '-' : (value.startsWith('+') ? '+' : '');
-                const numbers = value.replace(/[^0-9]/g, '');
-                e.target.value = sign + numbers;
+                // Remove any non-digit characters except minus sign
+                value = value.replace(/[^\d-]/g, '');
+                // Ensure minus sign is only at the start
+                if (value.includes('-')) {
+                    value = '-' + value.replace(/-/g, '');
+                }
+                e.target.value = value;
             }
 
             [takeoffWeightInput2, takeoffOATInput, takeoffSurfaceInput, takeoffElevationInput, takeoffWindInput].forEach(el => {
