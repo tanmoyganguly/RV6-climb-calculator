@@ -132,7 +132,8 @@
             </div>
 
             <div class="overflow-x-auto mb-8">
-                <table class="min-w-full text-center" id="performance-chart">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Climb Performance Chart</h2>
+                <table class="min-w-full text-center" id="performance-chart"
                     <thead class="bg-gray-800 text-white">
                         <tr>
                             <th class="py-3 px-2 font-semibold text-sm rounded-tl-lg">Altitude (ft)</th>
@@ -183,9 +184,25 @@
                 </table>
             </div>
 
-            <p class="text-sm text-gray-500 mt-4 italic text-center">
-                Edit the Indicated Airspeed and Climb Rate values directly or use the buttons to see the chart update.
-            </p>
+            <!-- Cruise Performance Chart -->
+            <div class="overflow-x-auto mb-8">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Cruise Table</h2>
+                <table class="min-w-full text-center" id="cruise-chart">
+                    <thead class="bg-purple-800 text-white">
+                        <tr>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tl-lg">Altitude (ft)</th>
+                            <th class="py-3 px-2 font-semibold text-sm">Economy KTAS</th>
+                            <th class="py-3 px-2 font-semibold text-sm">Economy GPH</th>
+                            <th class="py-3 px-2 font-semibold text-sm">High Power KTAS</th>
+                            <th class="py-3 px-2 font-semibold text-sm rounded-tr-lg">High Power GPH</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white" id="cruise-body">
+                        <!-- Data rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
         <!-- Tab 2: Performance Calculator -->
@@ -388,8 +405,30 @@
     window.liveChartData = [];
     window.liveTakeoffData = [];
     window.liveLandingData = [];
+    window.liveCruiseData = [];
     window.propPitchBias = 1.0;
     // Embedded performance data (from CSVs)
+    const initialCruiseData = [
+        { altitude: 0, econ_ktas: 130, econ_ff: 6.8, fast_ktas: 155, fast_ff: 12.5 },
+        { altitude: 1000, econ_ktas: 132, econ_ff: 6.7, fast_ktas: 157, fast_ff: 12.5 },
+        { altitude: 2000, econ_ktas: 134, econ_ff: 6.7, fast_ktas: 158, fast_ff: 12.5 },
+        { altitude: 3000, econ_ktas: 136, econ_ff: 6.6, fast_ktas: 160, fast_ff: 12.5 },
+        { altitude: 4000, econ_ktas: 140, econ_ff: 6.8, fast_ktas: 160, fast_ff: 11.0 },
+        { altitude: 5000, econ_ktas: 143, econ_ff: 7.0, fast_ktas: 160, fast_ff: 10.7 },
+        { altitude: 6000, econ_ktas: 145, econ_ff: 6.8, fast_ktas: 161, fast_ff: 10.5 },
+        { altitude: 7000, econ_ktas: 146, econ_ff: 6.8, fast_ktas: 161, fast_ff: 10.5 },
+        { altitude: 8000, econ_ktas: 148, econ_ff: 6.8, fast_ktas: 162, fast_ff: 10.3 },
+        { altitude: 9000, econ_ktas: 150, econ_ff: 6.8, fast_ktas: 162, fast_ff: 10.0 },
+        { altitude: 10000, econ_ktas: 151, econ_ff: 6.7, fast_ktas: 160, fast_ff: 9.5 },
+        { altitude: 11000, econ_ktas: 149, econ_ff: 6.6, fast_ktas: 158, fast_ff: 9.0 },
+        { altitude: 12000, econ_ktas: 146, econ_ff: 6.4, fast_ktas: 155, fast_ff: 8.5 },
+        { altitude: 13000, econ_ktas: 144, econ_ff: 6.1, fast_ktas: 153, fast_ff: 7.8 },
+        { altitude: 14000, econ_ktas: 142, econ_ff: 5.9, fast_ktas: 151, fast_ff: 7.3 },
+        { altitude: 15000, econ_ktas: 140, econ_ff: 5.7, fast_ktas: 148, fast_ff: 6.9 },
+        { altitude: 16000, econ_ktas: 137, econ_ff: 5.5, fast_ktas: 145, fast_ff: 6.5 },
+        { altitude: 17000, econ_ktas: 134, econ_ff: 5.3, fast_ktas: 142, fast_ff: 6.1 },
+        { altitude: 18000, econ_ktas: 132, econ_ff: 5.0, fast_ktas: 138, fast_ff: 5.7 }
+    ];
     const initialPerformanceData = [
         { altitude: 0, kias: 105, rate: 1200, fuel_flow: 15.0 },
         { altitude: 1000, kias: 105, rate: 1140, fuel_flow: 14.5 },
@@ -856,6 +895,7 @@
                                 const savedClimb = localStorage.getItem('climbPerformanceData');
                                 const savedTakeoff = localStorage.getItem('takeoffPerformanceData');
                                 const savedLanding = localStorage.getItem('landingPerformanceData');
+                                const savedCruise = localStorage.getItem('cruisePerformanceData');
                                 
                                 // Deep copy of initial data with all properties
                                 window.liveChartData = savedClimb ? JSON.parse(savedClimb) : initialPerformanceData.map(row => ({
@@ -866,10 +906,18 @@
                                 }));
                                 window.liveTakeoffData = savedTakeoff ? JSON.parse(savedTakeoff) : takeoffPerformance.slice();
                                 window.liveLandingData = savedLanding ? JSON.parse(savedLanding) : landingPerformance.slice();
+                                window.liveCruiseData = savedCruise ? JSON.parse(savedCruise) : initialCruiseData.map(row => ({
+                                    altitude: row.altitude,
+                                    econ_ktas: row.econ_ktas,
+                                    econ_ff: row.econ_ff,
+                                    fast_ktas: row.fast_ktas,
+                                    fast_ff: row.fast_ff
+                                }));
                                 console.log('Initializing charts:', {
                                     climb: window.liveChartData,
                                     takeoff: window.liveTakeoffData,
-                                    landing: window.liveLandingData
+                                    landing: window.liveLandingData,
+                                    cruise: window.liveCruiseData
                                 });
                                 renderChart();
                         }
@@ -1049,6 +1097,25 @@
                     `;
                     window.landingDistanceBody.appendChild(tr);
                 });
+                // Cruise Performance Chart
+                const cruiseBody = document.getElementById('cruise-body');
+                if (cruiseBody) {
+                    cruiseBody.innerHTML = '';
+                    window.liveCruiseData.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-b border-gray-200 hover:bg-purple-50';
+                        tr.innerHTML = `
+                            <td class="py-3 px-2 font-semibold">${row.altitude.toLocaleString()}</td>
+                            <td class="py-3 px-2 text-center">${Math.round(row.econ_ktas)}</td>
+                            <td class="py-3 px-2 text-center">${row.econ_ff.toFixed(1)}</td>
+                            <td class="py-3 px-2 text-center">${Math.round(row.fast_ktas)}</td>
+                            <td class="py-3 px-2 text-center">${row.fast_ff.toFixed(1)}</td>
+                        `;
+                        cruiseBody.appendChild(tr);
+                    });
+                }
+                
+                // Do not render cruise table in calculator tab
                 console.log('Charts rendered.');
             }
             
@@ -1093,6 +1160,9 @@
                     const climbBias = (200 - value) / 100; // 120% becomes 0.8 (worse climb), 80% becomes 1.2 (better climb)
                     const takeoffBias = 2 - climbBias; // inverse effect for distances
                     const landingBias = 1 + (takeoffBias - 1) * 0.5; // half effect for landing
+                    
+                    // Calculate cruise performance changes
+                    const propChange = (value - 100) / 3; // Convert slider value to percentage points (each 3% increase in pitch)
 
                     // Update climb performance data
                     window.liveChartData = initialPerformanceData.map(row => ({
@@ -1114,6 +1184,15 @@
                         ...row,
                         groundRoll: Math.round(row.groundRoll * landingBias),
                         over50ft: Math.round(row.over50ft * landingBias)
+                    }));
+
+                    // Update cruise performance data
+                    window.liveCruiseData = initialCruiseData.map(row => ({
+                        altitude: row.altitude,
+                        econ_ktas: row.econ_ktas * (1 + propChange * 0.01),  // 1% increase per 3% pitch
+                        econ_ff: Math.max(0, row.econ_ff - propChange * 0.1),  // 0.1 gph reduction per 3% pitch
+                        fast_ktas: row.fast_ktas * (1 + propChange * 0.004),  // 0.40% increase per 3% pitch
+                        fast_ff: Math.max(0, row.fast_ff - propChange * 0.15)  // 0.15 gph reduction per 3% pitch
                     }));
 
                     renderChart();
