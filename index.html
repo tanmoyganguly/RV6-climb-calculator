@@ -247,7 +247,7 @@
                     </div>
                     <div>
                         <label for="takeoff-wind" class="block text-sm font-medium text-gray-700 mb-1">Winds at Takeoff (knots, +/-)</label>
-                        <input type="number" id="takeoff-wind" value="0" 
+                        <input type="text" inputmode="numeric" pattern="[+-]?\d*" id="takeoff-wind" value="0" 
                             class="w-full p-3 border border-gray-300 rounded-lg"
                             title="Wind effect: Headwind (+) decreases distance by 10% per 10 knots. Tailwind (-) increases distance by 10% per 2 knots."
                             placeholder="+/- knots">
@@ -284,7 +284,7 @@
                     </div>
                     <div>
                         <label for="winds-aloft" class="block text-sm font-medium text-gray-700 mb-1">Winds Aloft (knots, +/-)</label>
-                        <input type="number" id="winds-aloft" value="0" 
+                        <input type="text" inputmode="numeric" pattern="[+-]?\d*" id="winds-aloft" value="0" 
                             class="w-full p-3 border border-gray-300 rounded-lg"
                             title="Winds at cruise altitude. Wind is interpolated between takeoff and cruise altitude. Positive = headwind, Negative = tailwind. Affects ground speed and distance calculations."
                             placeholder="+/- knots">
@@ -351,7 +351,7 @@
                     </div>
                     <div>
                         <label for="landing-wind" class="block text-sm font-medium text-gray-700 mb-1">Winds at Landing (knots, +/-)</label>
-                        <input type="number" id="landing-wind" value="0" 
+                        <input type="text" inputmode="numeric" pattern="[+-]?\d*" id="landing-wind" value="0" 
                             class="w-full p-3 border border-gray-300 rounded-lg"
                             title="Wind effect: Headwind (+) decreases distance by 10% per 10 knots. Tailwind (-) increases distance by 10% per 2 knots. Same factors as takeoff."
                             placeholder="+/- knots">
@@ -777,13 +777,17 @@
                     // For wind inputs, allow only numbers and a single leading + or -
                     if (e.target.id.includes('wind')) {
                         let value = e.target.value;
-                        // First, strip any non-digit/sign characters
+                        // Allow a minus sign to be typed at the current cursor position
+                        if (value === '-') {
+                            // Don't modify single minus sign
+                            return;
+                        }
+                        // Remove any non-digit/sign characters
                         value = value.replace(/[^\d+-]/g, '');
-                        // Handle sign: allow only at start
-                        const hasSign = value.startsWith('+') || value.startsWith('-');
+                        // Keep only one sign character at the start
                         const numbers = value.replace(/[+-]/g, '');
-                        value = (hasSign ? value[0] : '') + numbers;
-                        e.target.value = value;
+                        const sign = value.match(/^[+-]/) ? value.match(/^[+-]/)[0] : '';
+                        e.target.value = sign + numbers;
                     }
                     updateTakeoffPerformance();
                     updateTakeoffDADisplay();
