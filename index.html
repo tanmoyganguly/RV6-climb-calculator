@@ -56,37 +56,105 @@
         .info-button:focus + .tooltip {
             display: block;
         }
+        .summary-box-3d {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                inset 0 2px 4px 0 rgba(255, 255, 255, 0.9);
+            transform: translateZ(0);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+        .summary-box-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #34d399 0%, #059669 100%);
+            border-radius: 15px 15px 0 0;
+        }
+        .summary-box-3d:hover {
+            transform: translateY(-2px) translateZ(0);
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                inset 0 2px 4px 0 rgba(255, 255, 255, 0.9);
+        }
+        .summary-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+        }
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #059669;
+            line-height: 1.2;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+            display: block;
+            text-align: center;
+        }
+        .summary-box-3d {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 
+                0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                inset 0 2px 4px 0 rgba(255, 255, 255, 0.9);
+            transform: translateZ(0);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-box-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #34d399 0%, #059669 100%);
+            border-radius: 15px 15px 0 0;
+        }
+        .summary-box-3d:hover {
+            transform: translateY(-2px) translateZ(0);
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                inset 0 2px 4px 0 rgba(255, 255, 255, 0.9);
+        }
+        .summary-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .summary-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #059669;
+            line-height: 1.2;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-4xl mx-auto bg-w            if (resetDataBtn) {
-                resetDataBtn.addEventListener('click', async function() {
-                    localStorage.removeItem('propPitchBias');
-                    localStorage.removeItem('climbPerformanceData');
-                    localStorage.removeItem('takeoffPerformanceData');
-                    localStorage.removeItem('landingPerformanceData');
-                    propPitchSlider.value = 100;
-                    window.propPitchBias = 1.0;
-                    propPitchValue.textContent = '100%';
-                    await initializePerformanceCharts();
-                    showMessage('Performance data reset to default values.', 'success');
-                });
-            }
-
-            // Safety Factor slider handler
-            if (safetyFactorSlider) {
-                safetyFactorSlider.addEventListener('input', function() {
-                    const value = parseInt(this.value);
-                    safetyFactorValue.textContent = value + '%';
-                    
-                    // Update both takeoff and landing calculations to show new safety margins
-                    updateTakeoffPerformance();
-                    updateLandingPerformance();
-                });
-            }
-
-            // Initial rendering of the chart with default valuesl shadow-xl overflow-hidden p-8">
+    <div class="w-full max-w-4xl mx-auto bg-white shadow-xl overflow-hidden p-8">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900">VANS RV6 Performance Tool</h1>
             <p class="text-md text-gray-600 mt-2">Calculate takeoff, climb and landing performance</p>
@@ -288,7 +356,7 @@
 
             <!-- CLIMB Section -->
             <div class="mb-8 p-6 bg-green-50 rounded-lg border border-green-200">
-                <h2 class="text-lg font-bold text-green-800 mb-4">Climb</h2>
+                <h2 class="text-lg font-bold text-green-800 mb-4">Enroute</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="cruise-altitude" class="block text-sm font-medium text-gray-700 mb-1">Cruise Altitude (ft)</label>
@@ -306,29 +374,182 @@
                             title="Winds at cruise altitude. Wind is interpolated between takeoff and cruise altitude. Positive = headwind, Negative = tailwind. Affects ground speed and distance calculations."
                             placeholder="+/- knots">
                     </div>
+                    <div>
+                        <label for="total-distance" class="block text-sm font-medium text-gray-700 mb-1">Total Distance (nm)</label>
+                        <input type="number" id="total-distance" value="100" min="0" 
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            title="Total distance of the flight in nautical miles. Used to calculate trip time and fuel requirements.">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Power Setting</label>
+                        <div class="flex gap-4 p-3 border border-gray-300 rounded-lg"
+                            title="ECON: Lower fuel burn, slower speeds. FAST: Higher speeds, increased fuel burn.">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="power-setting" value="econ" class="form-radio" checked>
+                                <span class="ml-2">ECON</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="power-setting" value="fast" class="form-radio">
+                                <span class="ml-2">FAST</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="descent-fpm" class="block text-sm font-medium text-gray-700 mb-1">Descent Rate (ft/min)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="descent-fpm" 
+                                min="200" max="1000" value="500" step="50"
+                                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                title="Higher descent rates reduce fuel burn. 200fpm uses ECON fuel flow, 1000fpm reduces fuel flow by 1.5 GPH.">
+                            <span id="descent-fpm-value" class="text-sm font-semibold bg-blue-100 px-2 py-1 rounded whitespace-nowrap">500 ft/min</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="flex items-center gap-2 p-3 border border-gray-300 rounded-lg">
+                            <input type="checkbox" id="ifr-approach" class="form-checkbox"
+                                title="Adds 10nm for instrument approach at 90 knots using 5 GPH">
+                            <span class="text-sm font-medium text-gray-700">Include IFR Approach</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-4 bg-white rounded-lg border border-gray-200"
-                        title="Time = Σ(Segment Height ÷ Average Rate of Climb). Calculated in 100ft segments using interpolated climb rates from the performance chart.">
-                        <span class="block text-sm font-medium text-gray-600">Time to Cruise Altitude:</span>
-                        <span id="time-to-cruise-result" class="text-lg font-bold text-green-800"></span>
+                <div class="space-y-6">
+                    <!-- Summary -->
+                    <div class="p-6 bg-white rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold text-emerald-800 mb-8 text-left tracking-wide">TRIP SUMMARY</h3>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div
+                                title="Total Trip Time Calculation:
+1. Climb Time = Time to reach cruise altitude based on climb rates from performance chart
+2. Cruise Time = (Total Distance - Climb Distance - Descent Distance) ÷ Cruise Ground Speed
+3. Descent Time = Time for descent phase + IFR approach time (if selected)
+4. Total = Climb Time + Cruise Time + Descent Time">
+                                <div class="summary-box-3d">
+                                    <span class="summary-label text-center">Total Trip Time</span>
+                                    <span id="total-trip-time" class="summary-value"></span>
+                                </div>
+                            </div>
+                            <div
+                                title="Total Fuel Calculation:
+1. Taxi Fuel = 0.6 gallons (fixed)
+2. Climb Fuel = Integrated fuel flow during climb phase
+3. Cruise Fuel = Cruise time × Power setting fuel flow (ECON/FAST)
+4. Descent Fuel = Descent time × Interpolated fuel flow based on descent rate
+5. Total = Taxi + Climb + Cruise + Descent Fuel">
+                                <div class="summary-box-3d">
+                                    <span class="summary-label text-center">Total Trip Fuel</span>
+                                    <span id="total-trip-fuel" class="summary-value"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-4 bg-white rounded-lg border border-gray-200"
-                        title="Distance = Σ(Ground Speed × Time). Ground Speed = True Airspeed - Interpolated Wind. True airspeed increases with altitude by ~2% per 1000ft.">
-                        <span class="block text-sm font-medium text-gray-600">Distance to Cruise Altitude:</span>
-                        <span id="distance-to-cruise-result" class="text-lg font-bold text-green-800"></span>
+
+                    <!-- Climb Details -->
+                    <div class="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-2">
+                        <h3 class="font-semibold text-blue-800">Climb</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Time to Cruise Calculation:
+1. Altitude is divided into 100ft segments
+2. For each segment:
+   - Get climb rate from performance chart
+   - Time = Altitude change ÷ Climb rate
+3. Total time is sum of all segments">
+                                <span class="block text-sm font-medium text-gray-600">Time to Cruise Altitude:</span>
+                                <span id="time-to-cruise-result" class="text-lg font-bold text-blue-800"></span>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Climb Distance Calculation:
+1. For each 100ft segment:
+   - Calculate True Airspeed from IAS
+   - Apply interpolated wind effect
+   - Distance = Ground Speed × Time
+2. Total distance is sum of all segments">
+                                <span class="block text-sm font-medium text-gray-600">Distance to Cruise Altitude:</span>
+                                <span id="distance-to-cruise-result" class="text-lg font-bold text-blue-800"></span>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Climb Gradient Calculation:
+1. Total Altitude Gain = Cruise Alt - Takeoff Alt
+2. Total Ground Distance = Climb Distance (nm)
+3. Gradient = Altitude Gain ÷ Ground Distance">
+                                <span class="block text-sm font-medium text-gray-600">Average Climb Gradient:</span>
+                                <span id="avg-climb-gradient-result" class="text-lg font-bold text-blue-800"></span>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Climb Fuel Calculation:
+1. For each 100ft segment:
+   - Get fuel flow from performance chart
+   - Apply prop pitch bias adjustment
+   - Fuel = Flow × Time in segment
+2. Total fuel is sum of all segments">
+                                <span class="block text-sm font-medium text-gray-600">Fuel Burn in Climb:</span>
+                                <span id="fuel-burn-result" class="text-lg font-bold text-blue-800"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-4 bg-white rounded-lg border border-gray-200"
-                        title="Average Gradient = Total Altitude Gain ÷ Total Distance. Higher gradients indicate steeper climbs. Affected by winds - headwinds increase gradient, tailwinds decrease it.">
-                        <span class="block text-sm font-medium text-gray-600">Average Climb Gradient (ft/nm):</span>
-                        <span id="avg-climb-gradient-result" class="text-lg font-bold text-green-800"></span>
+
+                    <!-- Cruise Details -->
+                    <div class="p-4 bg-green-50/50 rounded-lg border border-green-200 space-y-2">
+                        <h3 class="font-semibold text-green-800">Cruise</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Cruise Time Calculation:
+1. Cruise Distance = Total Distance - (Climb + Descent Distance)
+2. Ground Speed = True Airspeed - Winds Aloft
+3. Cruise Time = Cruise Distance ÷ Ground Speed">
+                                <span class="block text-sm font-medium text-gray-600">Time in Cruise:</span>
+                                <span id="cruise-time" class="text-lg font-bold text-green-800"></span>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Cruise Fuel Calculation:
+1. Get fuel flow based on power setting (ECON/FAST)
+2. Apply altitude and temperature adjustments
+3. Cruise Fuel = Fuel Flow × Cruise Time">
+                                <span class="block text-sm font-medium text-gray-600">Cruise Fuel:</span>
+                                <span id="cruise-fuel" class="text-lg font-bold text-green-800"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-4 bg-white rounded-lg border border-gray-200"
-                        title="Total fuel burn during climb based on interpolated fuel flow rates. Not affected by prop pitch setting.">
-                        <span class="block text-sm font-medium text-gray-600">Fuel Burn in Climb:</span>
-                        <span id="fuel-burn-result" class="text-lg font-bold text-green-800"></span>
+
+                    <!-- Descent Details -->
+                    <div class="p-4 bg-yellow-50/50 rounded-lg border border-yellow-200 space-y-2">
+                        <h3 class="font-semibold text-yellow-800">Descent</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Descent Time Calculation:
+1. Standard Descent:
+   - Time = (Cruise Alt - Landing Alt) ÷ Descent Rate
+2. IFR Approach (if selected):
+   - Initial descent to 3000ft AGL
+   - Plus 10nm approach segment at 90 KIAS">
+                                <span class="block text-sm font-medium text-gray-600">Time to Descend:</span>
+                                <span id="descent-time" class="text-lg font-bold text-yellow-800"></span>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="Descent Fuel Calculation:
+1. Divide descent into 10 segments
+2. For each segment:
+   - Get ECON fuel flow for altitude
+   - Adjust for descent rate
+   - Calculate segment fuel burn
+3. Add IFR approach fuel if selected">
+                                <span class="block text-sm font-medium text-gray-600">Descent Fuel:</span>
+                                <span id="descent-fuel" class="text-lg font-bold text-yellow-800"></span>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-gray-200"
+                                title="TOD Distance Calculation:
+1. Standard Descent:
+   - Calculate True Airspeed for altitude
+   - Apply interpolated winds
+   - Distance = Ground Speed × Descent Time
+2. Add 10nm if IFR approach selected">
+                                <span class="block text-sm font-medium text-gray-600">Top of Descent Distance:</span>
+                                <span id="tod-distance" class="text-lg font-bold text-yellow-800"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- LANDING Section -->
@@ -698,6 +919,7 @@
                     totalTimeMinutes += segmentTimeMinutes;
                     totalDistanceNm += segmentDistanceNm;
                 }
+                
                 const averageGradient = totalDistanceNm > 0 ? (cruiseAlt - takeoffElev) / totalDistanceNm : 0;
                 const totalSeconds = Math.round(totalTimeMinutes * 60);
                 const minutes = Math.floor(totalSeconds / 60);
@@ -811,29 +1033,27 @@
             }
 
             // --- Event listeners for all inputs ---
-            function handleWindInput(e) {
-                // No need for special handling with type="number"
-                // The browser will handle negative numbers automatically
-            }
 
             [takeoffWeightInput2, takeoffOATInput, takeoffSurfaceInput, takeoffElevationInput, takeoffWindInput].forEach(el => {
-                el.addEventListener('input', (e) => {
-                    if (e.target.id.includes('wind')) {
-                        handleWindInput(e);
-                    }
+                el.addEventListener('input', () => {
                     updateTakeoffPerformance();
                     updateTakeoffDADisplay();
                     updateCruisePerformance();
                     updateCruiseDADisplay();
+                    // Update enroute calculations to reflect changes in climb performance
+                    updateEnrouteCalculations();
                 });
             });
-            [cruiseAltitudeInput, windsAloftInput].forEach(el => {
+            // Update calculations when cruise parameters change
+            [cruiseAltitudeInput, windsAloftInput, landingElevationInput, takeoffElevationInput, landingWindInput].forEach(el => {
                 el.addEventListener('input', (e) => {
                     if (e.target.id.includes('wind')) {
                         handleWindInput(e);
                     }
+                    updateIfrAvailability();
                     updateCruisePerformance();
                     updateCruiseDADisplay();
+                    updateEnrouteCalculations();
                 });
             });
             [landingWeightInput, landingOATInput, landingSurfaceInput, landingElevationInput, landingWindInput].forEach(el => {
@@ -869,6 +1089,297 @@
                 document.getElementById('cruise-da-display').textContent = `DA: ${da.toLocaleString()} ft`;
             }
 
+            // Cruise calculation functions
+            function getCruisePerformance(altitude, isPowerFast) {
+                // Check if we have data
+                if (!window.liveCruiseData || !window.liveCruiseData.length) {
+                    console.warn('No cruise data available');
+                    return { speed: 0, fuelFlow: 0 };
+                }
+
+                // Find the closest altitude in the cruise chart
+                const closest = window.liveCruiseData.reduce((prev, curr) => {
+                    return Math.abs(curr.altitude - altitude) < Math.abs(prev.altitude - altitude) ? curr : prev;
+                }, window.liveCruiseData[0]);
+                
+                return {
+                    speed: isPowerFast ? closest.fast_ktas : closest.econ_ktas,
+                    fuelFlow: isPowerFast ? closest.fast_ff : closest.econ_ff
+                };
+            }
+
+            function getDescentFuelFlow(altitude, descentFpm) {
+                // Check if we have data
+                if (!window.liveCruiseData || !window.liveCruiseData.length) {
+                    console.warn('No cruise data available');
+                    return 0;
+                }
+
+                // Get ECON fuel flow for this altitude
+                const closest = window.liveCruiseData.reduce((prev, curr) => {
+                    return Math.abs(curr.altitude - altitude) < Math.abs(prev.altitude - altitude) ? curr : prev;
+                }, window.liveCruiseData[0]);
+
+                // Linear interpolation between ECON (at 200fpm) and ECON-1.5 (at 1000fpm)
+                const fpmFactor = (descentFpm - 200) / (1000 - 200);
+                return closest.econ_ff - (fpmFactor * 1.5);
+            }
+
+            function updateIfrAvailability() {
+                const cruiseAlt = parseFloat(document.getElementById('cruise-altitude').value);
+                const landingElev = parseFloat(document.getElementById('landing-elevation').value);
+                const ifrCheckbox = document.getElementById('ifr-approach');
+                const altitudeDiff = cruiseAlt - landingElev;
+                
+                if (altitudeDiff < 3000) {
+                    ifrCheckbox.checked = false;
+                    ifrCheckbox.disabled = true;
+                    ifrCheckbox.title = 'IFR approach requires at least 3000ft between cruise and landing altitude';
+                } else {
+                    ifrCheckbox.disabled = false;
+                    ifrCheckbox.title = 'Adds IFR approach with 3000ft transition altitude and 10nm final';
+                }
+                // If we disable the checkbox, make sure to update calculations
+                if (ifrCheckbox.disabled && ifrCheckbox.checked) {
+                    ifrCheckbox.checked = false;
+                    updateEnrouteCalculations();
+                }
+            }
+
+                function updateEnrouteCalculations() {
+                    console.log('\n=== Starting Enroute Calculations ===');
+                    const cruiseAlt = parseFloat(document.getElementById('cruise-altitude').value);
+                    const totalDistance = parseFloat(document.getElementById('total-distance').value);
+                    const descentFpm = parseInt(document.getElementById('descent-fpm').value);
+                    const isPowerFast = document.querySelector('input[name="power-setting"]:checked').value === 'fast';
+                    const wind = parseFloat(document.getElementById('winds-aloft').value);
+                    const takeoffWind = parseFloat(document.getElementById('takeoff-wind').value) || 0;
+                    const includeIfrApproach = document.getElementById('ifr-approach').checked;                updateIfrAvailability();
+                
+                console.log('Input parameters:', {
+                    cruiseAltitude: cruiseAlt + ' ft',
+                    totalDistance: totalDistance + ' nm',
+                    descentRate: descentFpm + ' ft/min',
+                    powerSetting: isPowerFast ? 'FAST' : 'ECON',
+                    wind: wind + ' kts',
+                    ifrApproach: includeIfrApproach
+                });
+
+                // Get cruise performance
+                const cruisePerf = getCruisePerformance(cruiseAlt, isPowerFast);
+                const cruiseWind = parseFloat(document.getElementById('winds-aloft').value);
+                const groundSpeed = cruisePerf.speed - cruiseWind;
+
+                // IFR approach time and fuel are now included in the descent calculations
+                const ifrApproachTime = 0; // Already included in descent time
+                const ifrApproachFuel = 0; // Will be calculated as part of descent fuel
+
+                // Calculate descent phase
+                console.log('\n=== Calculating Descent Phase ===');
+                const landingElev = parseFloat(document.getElementById('landing-elevation').value);
+                const landingWind = parseFloat(document.getElementById('landing-wind').value) || 0;
+                const altitudeDifference = cruiseAlt - landingElev; // Total altitude to descend
+                const ifrTransitionAlt = landingElev + 3000;
+                let totalDescentTime = 0;
+                let totalDescentDistance = 0;
+
+                function interpolateDescentWind(currentAlt) {
+                    // Linear interpolation between winds aloft and landing winds
+                    const altitudeFraction = (currentAlt - landingElev) / (cruiseAlt - landingElev);
+                    return landingWind + (wind - landingWind) * altitudeFraction;
+                }
+
+                console.log('Descent parameters:', {
+                    cruiseAltitude: cruiseAlt + ' ft',
+                    landingElevation: landingElev + ' ft',
+                    altitudeDifference: altitudeDifference + ' ft',
+                    descentRate: descentFpm + ' ft/min',
+                    ifrApproach: includeIfrApproach ? 'Yes' : 'No'
+                });
+
+                if (cruiseAlt > ifrTransitionAlt && includeIfrApproach) {
+                    // First descent phase: Cruise to IFR transition altitude
+                    const descentToTransitionAlt = cruiseAlt - ifrTransitionAlt;
+                    const descentToTransitionTime = descentToTransitionAlt / descentFpm;
+                    
+                    // Use cruise performance numbers for initial descent
+                    const avgDescentPerf = getCruisePerformance((cruiseAlt + ifrTransitionAlt) / 2, true);
+                    const avgAlt = (cruiseAlt + ifrTransitionAlt) / 2;
+                    const segmentWind = interpolateDescentWind(avgAlt);
+                    const descentGroundSpeed = avgDescentPerf.speed - segmentWind;
+                    const descentToTransitionDistance = (descentGroundSpeed * descentToTransitionTime / 60);
+                    
+                    totalDescentTime = descentToTransitionTime;
+                    totalDescentDistance = descentToTransitionDistance;
+
+                    // Second phase: IFR approach descent (10nm at 3° slope)
+                    const approachWind = interpolateDescentWind(ifrTransitionAlt);
+                    const approachGroundSpeed = getTrueAirspeed(90, ifrTransitionAlt) - approachWind;
+                    const ifrApproachTime = (10 / approachGroundSpeed) * 60; // 10nm at calculated ground speed
+                    const approachTime = (10 / approachGroundSpeed) * 60; // 10nm at calculated ground speed
+                    
+                    totalDescentTime += ifrApproachTime;
+                    totalDescentDistance += 10; // Fixed 10nm for IFR approach
+
+                    console.log('IFR descent:', {
+                        initialPhase: {
+                            altitude: descentToTransitionAlt + ' ft',
+                            time: descentToTransitionTime.toFixed(1) + ' minutes',
+                            distance: descentToTransitionDistance.toFixed(1) + ' nm'
+                        },
+                        approachPhase: {
+                            altitude: '3000 ft',
+                            time: ifrApproachTime.toFixed(1) + ' minutes',
+                            distance: '10 nm',
+                            groundSpeed: approachGroundSpeed.toFixed(1) + ' kts'
+                        }
+                    });
+                } else {
+                    // Standard descent without IFR approach
+                    const descentTimeMinutes = altitudeDifference / descentFpm;
+                    const avgDescentPerf = getCruisePerformance((cruiseAlt + landingElev) / 2, true);
+                    const avgAlt = (cruiseAlt + landingElev) / 2;
+                    const segmentWind = interpolateDescentWind(avgAlt);
+                    const descentGroundSpeed = avgDescentPerf.speed - segmentWind;
+                    const descentDistance = (descentGroundSpeed * descentTimeMinutes / 60);
+                    
+                    totalDescentTime = descentTimeMinutes;
+                    totalDescentDistance = descentDistance;
+                    
+                    console.log('Standard descent:', {
+                        time: descentTimeMinutes.toFixed(1) + ' minutes',
+                        distance: descentDistance.toFixed(1) + ' nm',
+                        groundSpeed: descentGroundSpeed.toFixed(1) + ' kts'
+                    });
+                }
+
+                // Calculate climb values (from existing data)
+                console.log('\n=== Calculating Climb Phase ===');
+                const { climbTime, climbDistance, climbFuel } = calculateClimbValues();
+                console.log('Climb phase results:', {
+                    climbTime: climbTime.toFixed(1) + ' minutes',
+                    climbDistance: climbDistance.toFixed(1) + ' nm',
+                    climbFuel: climbFuel.toFixed(1) + ' gallons'
+                });
+
+                // Calculate cruise distance and time
+                const cruiseDistance = Math.max(0, totalDistance - climbDistance - totalDescentDistance);
+                const cruiseTimeHours = cruiseDistance / groundSpeed;
+                
+                console.log('\n=== Calculating Cruise Phase ===');
+                console.log('Cruise calculations:', {
+                    cruiseDistance: cruiseDistance.toFixed(1) + ' nm',
+                    groundSpeed: groundSpeed.toFixed(1) + ' kts',
+                    cruiseTime: (cruiseTimeHours * 60).toFixed(1) + ' minutes'
+                });
+                const cruiseTimeMinutes = cruiseTimeHours * 60;
+
+                // Calculate fuel burns
+                const cruiseFuel = cruiseTimeHours * cruisePerf.fuelFlow;
+                let totalDescentFuel = 0;
+                const taxiFuel = 0.6; // Standard taxi fuel allowance
+                
+                // Calculate descent fuel in segments
+                const descentSegments = 10;
+                const altitudeStep = cruiseAlt / descentSegments;
+                const descentTimeHours = totalDescentTime / 60;  // Convert minutes to hours
+                for (let i = 0; i < descentSegments; i++) {
+                    const segmentAlt = cruiseAlt - (i * altitudeStep);
+                    const fuelFlow = getDescentFuelFlow(segmentAlt, descentFpm);
+                    totalDescentFuel += (fuelFlow * (descentTimeHours / descentSegments));
+                }
+
+                // Format times
+                const climbTimeMinutes = Math.round(climbTime);
+                const descentTimeMinutes = totalDescentTime;  // Use the already calculated totalDescentTime
+                const totalMinutes = climbTimeMinutes + cruiseTimeMinutes + descentTimeMinutes + ifrApproachTime;
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = Math.round(totalMinutes % 60);
+
+                console.log('\n=== Final Time Breakdown ===');
+                console.log('Time components:', {
+                    climbPhase: climbTimeMinutes + ' minutes',
+                    cruisePhase: Math.round(cruiseTimeMinutes) + ' minutes',
+                    descentPhase: Math.round(descentTimeMinutes) + ' minutes',
+                    ifrApproach: Math.round(ifrApproachTime) + ' minutes',
+                    totalTime: `${hours}h ${minutes}m (${totalMinutes.toFixed(1)} minutes)`
+                });
+
+                // Update displays with consistent formatting
+                const formatTime = (totalMins) => {
+                    const hrs = Math.floor(totalMins / 60);
+                    const mins = Math.round(totalMins % 60);
+                    if (hrs === 0) {
+                        return `${mins}m`;
+                    }
+                    return `${hrs}h ${mins}m`;
+                };
+
+                document.getElementById('total-trip-time').textContent = formatTime(totalMinutes);
+                document.getElementById('time-to-cruise-result').textContent = formatTime(climbTimeMinutes);
+                document.getElementById('cruise-time').textContent = formatTime(cruiseTimeMinutes);
+                document.getElementById('descent-time').textContent = formatTime(descentTimeMinutes);
+                document.getElementById('cruise-fuel').textContent = `${cruiseFuel.toFixed(1)} gal`;
+                document.getElementById('descent-fuel').textContent = `${(totalDescentFuel + ifrApproachFuel).toFixed(1)} gal`;
+                document.getElementById('total-trip-fuel').textContent = `${(taxiFuel + climbFuel + cruiseFuel + totalDescentFuel + ifrApproachFuel).toFixed(1)} gal`;
+                document.getElementById('tod-distance').textContent = `${totalDescentDistance.toFixed(1)} nm`;
+            }
+
+            function calculateClimbValues() {
+                const takeoffElev = parseFloat(takeoffElevationInput.value);
+                const cruiseAlt = parseFloat(cruiseAltitudeInput.value);
+                const takeoffOAT = parseFloat(takeoffOATInput.value);
+                const takeoffWind = parseFloat(takeoffWindInput.value);
+                const cruiseWind = parseFloat(document.getElementById('winds-aloft').value);
+
+                function interpolateWind(altitude) {
+                    return takeoffWind + ((cruiseWind - takeoffWind) * (altitude - takeoffElev) / (cruiseAlt - takeoffElev));
+                }
+                let totalTime = 0;
+                let totalDistance = 0;
+                let totalFuel = 0;
+                const altitudeIncrement = 100;
+
+                if (cruiseAlt > takeoffElev) {
+                    for (let alt = takeoffElev; alt < cruiseAlt; alt += altitudeIncrement) {
+                    const currentAlt = alt;
+                    const nextAlt = Math.min(alt + altitudeIncrement, cruiseAlt);
+                    const segmentAltitudeChange = nextAlt - currentAlt;
+                    
+                    const currentDA = getCruiseDensityAltitude(currentAlt, takeoffElev, takeoffOAT);
+                    const nextDA = getCruiseDensityAltitude(nextAlt, takeoffElev, takeoffOAT);
+                    
+                    const rate1 = getValueFromChartData(currentDA, 'rate');
+                    const rate2 = getValueFromChartData(nextDA, 'rate');
+                    const avgRate = (rate1 + rate2) / 2;
+                    
+                    const ias1 = getValueFromChartData(currentDA, 'kias');
+                    const ias2 = getValueFromChartData(nextDA, 'kias');
+                    const tas1 = getTrueAirspeed(ias1, currentDA);
+                    const tas2 = getTrueAirspeed(ias2, nextDA);
+                    const avgTas = (tas1 + tas2) / 2;
+                    
+                    if (avgRate <= 0) break;
+
+                    const ff1 = getValueFromChartData(currentDA, 'fuel_flow');
+                    const ff2 = getValueFromChartData(nextDA, 'fuel_flow');
+                    const avgFuelFlow = (ff1 + ff2) / 2;
+                    
+                    const segmentTimeMinutes = segmentAltitudeChange / avgRate;
+                    const segmentWind = interpolateWind((currentAlt + nextAlt) / 2);
+                    const groundSpeed = avgTas - segmentWind;
+                    const segmentDistance = (groundSpeed / 60) * segmentTimeMinutes;
+                    
+                    const segmentTimeHours = segmentTimeMinutes / 60;
+                    totalFuel += avgFuelFlow * segmentTimeHours;
+                    totalTime += segmentTimeMinutes;
+                    totalDistance += segmentDistance;
+                    }
+                }
+
+                return { climbTime: totalTime, climbDistance: totalDistance, climbFuel: totalFuel };
+            }
+
             // Function to update all calculations
             function updateAllCalculations() {
                 updateTakeoffPerformance();
@@ -879,8 +1390,54 @@
                 updateLandingDADisplay();
             }
 
+            // Setup descent rate display
+            const descentFpmSlider = document.getElementById('descent-fpm');
+            const descentFpmValue = document.getElementById('descent-fpm-value');
+            if (descentFpmSlider) {
+                descentFpmSlider.addEventListener('input', function() {
+                    const value = parseInt(this.value);
+                    descentFpmValue.textContent = value + ' ft/min';
+                    updateEnrouteCalculations();
+                });
+            }
+
+            // Add listeners for cruise calculations
+            ['total-distance', 'ifr-approach'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', () => {
+                        if (id === 'ifr-approach') {
+                            updateIfrAvailability();
+                        }
+                        updateEnrouteCalculations();
+                    });
+                }
+            });
+
+            // Power setting radio buttons
+            document.querySelectorAll('input[name="power-setting"]').forEach(radio => {
+                radio.addEventListener('change', updateEnrouteCalculations);
+            });
+
+            // Update calculations on any input change
+            const updateAll = () => {
+                updateAllCalculations();
+                updateEnrouteCalculations();
+            };
+
+            // Ensure we have initial data before calculations
+            if (!window.liveCruiseData || !window.liveCruiseData.length) {
+                window.liveCruiseData = initialCruiseData.map(row => ({
+                    altitude: row.altitude,
+                    econ_ktas: row.econ_ktas,
+                    econ_ff: row.econ_ff,
+                    fast_ktas: row.fast_ktas,
+                    fast_ff: row.fast_ff
+                }));
+            }
+
             // Initial calculation
-            updateAllCalculations();
+            updateAll();
             // Performance Calculator elements are now part of the new tabbed interface
 
 
@@ -1133,6 +1690,24 @@
             });
             // Removed all weight adjustment logic and buttons for Performance Chart tab
 
+            // Function to handle wind input validation
+            function handleWindInput(event) {
+                const input = event.target;
+                // Allow empty value, minus sign, or numbers
+                let value = input.value.replace(/[^0-9-]/g, '');
+                
+                // Ensure only one minus sign at the start
+                if (value.indexOf('-') > 0) {
+                    value = value.replace(/-/g, '');
+                }
+                if (value.startsWith('--')) {
+                    value = value.substring(1);
+                }
+                
+                // Update input value
+                input.value = value;
+            }
+
             // Add event listener for prop pitch bias slider
             const propPitchSlider = document.getElementById('prop-pitch-bias');
             const propPitchValue = document.getElementById('prop-pitch-value');
@@ -1195,6 +1770,8 @@
                     updateTakeoffPerformance();
                     updateCruisePerformance();
                     updateLandingPerformance();
+                    // Update enroute calculations with new climb data
+                    updateEnrouteCalculations();
                 });
             }
 
